@@ -108,7 +108,16 @@ Here’s what the directory structure can look like on the server:
 │   └── caddy.service
 └── projects
     └── just-bun
+        ├── public
+        │   ├── assets
+        │   │   ├── elysia-BWovwTWN.svg
+        │   │   ├── index-6YzeFRVx.css
+        │   │   ├── index-DNvYkrHy.js
+        │   │   └── pages-B7j4pB_e.js
+        │   ├── favicon.svg
+        │   └── robots.txt
         ├── just-bun.service
+        ├── vars.caddy
         ├── Caddyfile
         ├── server -> /opt/projects/just-bun/server.f977374
         ├── server.433db9e

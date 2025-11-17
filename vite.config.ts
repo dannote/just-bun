@@ -17,7 +17,7 @@ export default defineConfig({
   },
   plugins: [
     // Nitro is just the bundling shell; Elysia still serves the HTTP requests.
-    nitro({ noExternals: true, serveStatic: 'inline', preset: 'bun' }),
+    nitro({ noExternals: true, serveStatic: false, preset: 'bun' }),
     tailwindcss(),
     vueRouter({ routesFolder: 'app/pages' }),
     autoImport({ imports: ['vue', VueRouterAutoImports] }),

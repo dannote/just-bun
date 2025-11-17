@@ -9,9 +9,10 @@ root := justfile_directory()
 releases_dir := root + "/releases"
 configs_dir := root + "/configs"
 generated_configs_dir := configs_dir + "/generated"
+public_dir := root + "/.output/public"
 
 project_name := env("DEPLOY_PROJECT_NAME", "just-bun")
-deploy_project_dir := env("DEPLOY_PROJECTS_DIR", "/opt/projects") + "/" + project_name + "/"
+deploy_project_dir := env("DEPLOY_PROJECTS_DIR", "/opt/projects") + "/" + project_name
 
 export DEPLOY_PROJECT_DIR := deploy_project_dir
 
@@ -32,6 +33,12 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+'''
+
+caddy_vars := '''
+vars {
+  public $DEPLOY_PROJECT_DIR/public
+}
 '''
 
 hash := `git rev-parse --short HEAD`
@@ -64,6 +71,8 @@ upload: _ssh-open
 
   {{rsync}} {{releases_dir}}/server.$DEPLOY_TARGET {{ssh_user_host}}:{{deploy_project_dir}}/server.latest
 
+  {{rsync}} {{public_dir}}/ {{ssh_user_host}}:{{deploy_project_dir}}/public/
+
   {{ssh-run}} chmod +x {{deploy_project_dir}}/server.latest
   {{ssh-run}} cp -n {{deploy_project_dir}}/server.latest {{deploy_project_dir}}/server.{{hash}}
   {{ssh-run}} ln -sfn {{deploy_project_dir}}/server.{{hash}} {{deploy_project_dir}}/server
@@ -71,10 +80,14 @@ upload: _ssh-open
 _generate-service:
   printf "%s" "{{service}}" > {{generated_configs_dir}}/{{project_name}}.service
 
-setup-systemd: _generate-service
+_generate-caddy-vars:
+  printf "%s" "{{caddy_vars}}" > {{generated_configs_dir}}/vars.caddy
+
+setup-systemd: _generate-service _generate-caddy-vars
   @echo '{{ACCENT}}Updating systemd configuration{{RESET}}'
   
   {{rsync}} {{generated_configs_dir}}/{{project_name}}.service {{ssh_user_host}}:{{deploy_project_dir}}
+  {{rsync}} {{generated_configs_dir}}/vars.caddy {{ssh_user_host}}:{{deploy_project_dir}}
 
   {{ssh-run}} sudo ln -sfn {{deploy_project_dir}}/{{project_name}}.service /etc/systemd/system/{{project_name}}.service
 

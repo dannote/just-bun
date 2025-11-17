@@ -17,11 +17,3 @@ _ssh-open:
   fi
 
   ssh -N -f -o ControlMaster=yes {{ssh_base_opts}} {{ssh_user_host}}
-
-_ssh-make-deploy-dir deploy-dir: _ssh-open
-  {{ssh-run}} sudo mkdir -p {{deploy-dir}}
-  {{ssh-run}} sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP {{deploy-dir}}
-  {{ssh-run}} sudo chmod g+s {{deploy-dir}}
-
-_ssh: _ssh-open
-  {{ssh-run}}

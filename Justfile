@@ -14,7 +14,9 @@ mod shadcn "recipes/shadcn.just"
 alias install := app::install
 alias release := app::release
 alias deploy := app::deploy
-alias ssh := _ssh
+
+ssh: _ssh-open
+  - {{ssh-run}}
 
 [script]
 example:

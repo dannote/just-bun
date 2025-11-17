@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "typescript": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/assets/main.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "bootstrap",
+  "aliases": {
+    "components": "~/app/components",
+    "utils": "~/app/lib/utils",
+    "ui": "~/app/components/ui",
+    "lib": "~/app/lib",
+    "composables": "~/app/composables"
+  },
+  "registries": {}
+}

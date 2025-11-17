@@ -1,0 +1,11 @@
+# Caddy obtains and renews Let's Encrypt certs automatically for this host.
+exmple.com {
+  tls admin@example.com
+
+  reverse_proxy localhost:3000
+
+  header {
+    -Server
+    Strict-Transport-Security "max-age=31536000;"
+  }
+}

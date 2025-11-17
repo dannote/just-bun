@@ -1,0 +1,17 @@
+{
+  "extends": ["nitro/tsconfig"],
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "types": [
+      "vue",
+      "@vue/compiler-sfc",
+      "@unhead/vue",
+      "vue-router",
+      "unplugin-vue-router/client",
+      "vite/client"
+    ]
+  }
+}

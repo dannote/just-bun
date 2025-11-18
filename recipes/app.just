@@ -120,7 +120,10 @@ stop: _ssh-open
 status: _ssh-open
   {{systemctl}} status {{project_name}}
 
-deploy: caddy::require release-production upload setup-systemd restart
+logs *args: _ssh-open
+  {{ssh-run}} journalctl -u {{project_name}} {{args}}
+
+deploy: caddy::require release-production upload setup-systemd restart status
   @echo '{{ACCENT}}Restarting caddy to reload configs{{RESET}}'
   
   just caddy restart

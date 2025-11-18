@@ -89,6 +89,7 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just app release` — compile the server to a static Bun binary in `releases/`.
 - `just ssh` — open an interactive shell on the deploy target.
 - `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy helper.
+- `just app logs <journalctl args>` — stream service logs (e.g. `just app logs -f`).
 - `just deploy` — alias of `app::deploy` to push a build to your server.
 
 ## Deployment (no Docker required)

@@ -98,6 +98,12 @@ Caddy will fetch and renew Let's Encrypt certificates automatically for any host
 in the `Caddyfile` as soon as DNS points at your server; the first HTTPS check
 may take a few seconds while ACME completes.
 
+The generated `app.service` applies systemd hardening flags
+(`ProtectSystem=strict`, `ProtectHome=yes`, `PrivateTmp=yes`,
+`PrivateDevices=yes`, `ProtectKernelTunables=yes`, `ProtectKernelModules=yes`,
+`ProtectControlGroups=yes`). Binaries live in `bin/`, config in `etc/`, and
+static files in `public/`.
+
 Here’s what the directory structure can look like on the server:
 
 ```
@@ -108,24 +114,26 @@ Here’s what the directory structure can look like on the server:
 │   └── caddy.service
 └── projects
     └── just-bun
-        ├── public
-        │   ├── assets
-        │   │   ├── elysia-BWovwTWN.svg
-        │   │   ├── index-6YzeFRVx.css
-        │   │   ├── index-DNvYkrHy.js
-        │   │   └── pages-B7j4pB_e.js
-        │   ├── favicon.svg
-        │   └── robots.txt
-        ├── just-bun.service
-        ├── vars.caddy
-        ├── Caddyfile
-        ├── server -> /opt/projects/just-bun/server.f977374
-        ├── server.433db9e
-        ├── server.8503300
-        ├── server.a6aa7bf
-        ├── server.f78495a
-        ├── server.f977374
-        └── server.latest
+        ├── app.service
+        ├── bin
+        │   ├── server -> /opt/projects/just-bun/bin/server.f977374
+        │   ├── server.433db9e
+        │   ├── server.8503300
+        │   ├── server.a6aa7bf
+        │   ├── server.f78495a
+        │   ├── server.f977374
+        │   └── server.latest
+        ├── etc
+        │   ├── Caddyfile
+        │   └── vars.caddy
+        └── public
+            ├── assets
+            │   ├── elysia-BWovwTWN.svg
+            │   ├── index-6YzeFRVx.css
+            │   ├── index-DNvYkrHy.js
+            │   └── pages-B7j4pB_e.js
+            ├── favicon.svg
+            └── robots.txt
 ```
 
 ## Stack highlights

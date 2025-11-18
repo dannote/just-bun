@@ -35,7 +35,7 @@ WantedBy=multi-user.target
 '''
 
 config := '''
-import "$DEPLOY_PROJECTS_DIR/*/Caddyfile"
+import "$DEPLOY_PROJECTS_DIR/*/etc/Caddyfile"
 '''
 
 require: _ssh-open
@@ -60,7 +60,7 @@ download:
   set -euo pipefail
 
   if [ -f "{{releases_dir}}/caddy.{{platform}}" ]; then
-    echo '{{SUCCESS}}Already have {{releases_dir}}/caddy.{{platform}}, skipping download{{RESET}}'
+    echo '{{MUTED}}Already have {{releases_dir}}/caddy.{{platform}}, skipping download{{RESET}}'
     exit 0
   fi
 

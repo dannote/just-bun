@@ -13,6 +13,8 @@ public_dir := root + "/.output/public"
 
 project_name := env("DEPLOY_PROJECT_NAME", "just-bun")
 deploy_project_dir := env("DEPLOY_PROJECTS_DIR", "/opt/projects") + "/" + project_name
+deploy_bin_dir := deploy_project_dir + "/bin"
+deploy_etc_dir := deploy_project_dir + "/etc"
 
 export DEPLOY_PROJECT_DIR := deploy_project_dir
 
@@ -25,11 +27,21 @@ After=network.target
 Type=simple
 User=$DEPLOY_USER
 Group=$DEPLOY_GROUP
+
 WorkingDirectory=$DEPLOY_PROJECT_DIR
 EnvironmentFile=-$DEPLOY_PROJECT_DIR/.env
 EnvironmentFile=-$DEPLOY_PROJECT_DIR/.env.production
-ExecStart=$DEPLOY_PROJECT_DIR/server
+ExecStart=$DEPLOY_PROJECT_DIR/bin/server
+
 Restart=on-failure
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
 
 [Install]
 WantedBy=multi-user.target
@@ -62,23 +74,23 @@ release-production:
 upload: _ssh-open
   @echo '{{ACCENT}}Uploading release artifacts and configuration{{RESET}}'
   
-  {{ssh-run}} sudo mkdir -p {{deploy_project_dir}}
+  {{ssh-run}} sudo mkdir -p {{deploy_project_dir}} {{deploy_bin_dir}} {{deploy_etc_dir}}
   {{ssh-run}} sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP {{deploy_project_dir}}
-  {{ssh-run}} sudo chmod g+s {{deploy_project_dir}}
+  {{ssh-run}} sudo chmod g+s {{deploy_project_dir}} {{deploy_bin_dir}} {{deploy_etc_dir}}
 
-  {{rsync}} {{root}}/Caddyfile {{ssh_user_host}}:{{deploy_project_dir}}
+  {{rsync}} {{root}}/Caddyfile {{ssh_user_host}}:{{deploy_etc_dir}}/Caddyfile
   if [ -f "{{root}}/.env.production" ]; then {{rsync}} {{root}}/.env.production {{ssh_user_host}}:{{deploy_project_dir}}; fi
 
-  {{rsync}} {{releases_dir}}/server.$DEPLOY_TARGET {{ssh_user_host}}:{{deploy_project_dir}}/server.latest
+  {{rsync}} {{releases_dir}}/server.$DEPLOY_TARGET {{ssh_user_host}}:{{deploy_bin_dir}}/server.latest
 
   {{rsync}} {{public_dir}}/ {{ssh_user_host}}:{{deploy_project_dir}}/public/
 
-  {{ssh-run}} chmod +x {{deploy_project_dir}}/server.latest
-  {{ssh-run}} cp -n {{deploy_project_dir}}/server.latest {{deploy_project_dir}}/server.{{hash}}
-  {{ssh-run}} ln -sfn {{deploy_project_dir}}/server.{{hash}} {{deploy_project_dir}}/server
+  {{ssh-run}} chmod +x {{deploy_bin_dir}}/server.latest
+  {{ssh-run}} cp -n {{deploy_bin_dir}}/server.latest {{deploy_bin_dir}}/server.{{hash}}
+  {{ssh-run}} ln -sfn {{deploy_bin_dir}}/server.{{hash}} {{deploy_bin_dir}}/server
 
 _generate-service:
-  printf "%s" "{{service}}" > {{generated_configs_dir}}/{{project_name}}.service
+  printf "%s" "{{service}}" > {{generated_configs_dir}}/app.service
 
 _generate-caddy-vars:
   printf "%s" "{{caddy_vars}}" > {{generated_configs_dir}}/vars.caddy
@@ -86,10 +98,10 @@ _generate-caddy-vars:
 setup-systemd: _generate-service _generate-caddy-vars
   @echo '{{ACCENT}}Updating systemd configuration{{RESET}}'
   
-  {{rsync}} {{generated_configs_dir}}/{{project_name}}.service {{ssh_user_host}}:{{deploy_project_dir}}
-  {{rsync}} {{generated_configs_dir}}/vars.caddy {{ssh_user_host}}:{{deploy_project_dir}}
+  {{rsync}} {{generated_configs_dir}}/app.service {{ssh_user_host}}:{{deploy_project_dir}}/app.service
+  {{rsync}} {{generated_configs_dir}}/vars.caddy {{ssh_user_host}}:{{deploy_etc_dir}}/vars.caddy
 
-  {{ssh-run}} sudo ln -sfn {{deploy_project_dir}}/{{project_name}}.service /etc/systemd/system/{{project_name}}.service
+  {{ssh-run}} sudo ln -sfn {{deploy_project_dir}}/app.service /etc/systemd/system/{{project_name}}.service
 
   {{systemctl}} daemon-reload
   {{systemctl}} enable {{project_name}}
@@ -114,13 +126,13 @@ deploy: caddy::require release-production upload setup-systemd restart
   just caddy restart
 
 version: _ssh-open
-  {{ssh-run}} "cd {{deploy_project_dir}} && basename \$(readlink server) | sed 's/^server\.//'"
+  {{ssh-run}} "cd {{deploy_bin_dir}} && basename \$(readlink server) | sed 's/^server\.//'"
 
 prune: _ssh-open
   #!/bin/bash
 
   {{ssh-run}} '
-    ls -1t {{deploy_project_dir}}/server.* 2>/dev/null \
+    ls -1t {{deploy_bin_dir}}/server.* 2>/dev/null \
     | tail -n +4 \
     | grep -v \"server.{{hash}}\" \
     | xargs -r rm -f

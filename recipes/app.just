@@ -63,6 +63,7 @@ release platform='': build
 
   bun build \
     --compile {{root}}/.output/server/index.mjs \
+    --compile-autoload-dotenv \
     --outfile {{releases_dir}}/server{{ if platform != '' { "." + platform } else { "" } }} \
     {{ if platform != '' { "--target=bun-" + platform } else { "" } }}
 

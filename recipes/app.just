@@ -17,6 +17,7 @@ cache_dir := deploy_cache + "/" + DEPLOY_PROJECT_NAME
 
 hash := `git rev-parse --short HEAD`
 
+# Install project dependencies
 install:
   bun install
 
@@ -28,6 +29,7 @@ _bun-target target:
   [[ "$os" == "linux" && "$arch" == "x64" ]] && arch="x64-baseline"
   echo "bun-$os-$arch"
 
+# Build and compile binary for target platform (e.g., linux-amd64)
 release target='': build
   #!/usr/bin/env bash
   set -euo pipefail
@@ -50,10 +52,12 @@ release target='': build
 
   echo '{{SUCCESS}}Built {{DEPLOY_PROJECT_NAME}}.{{hash}}{{RESET}}'
 
+# Build release for production target
 release-production:
   @echo '{{ACCENT}}Building release for target: $DEPLOY_TARGET{{RESET}}'
   just app release $DEPLOY_TARGET
 
+# Upload binary, configs, and static files to server
 upload: _ssh-open (_generate-config "app.caddy")
   #!/usr/bin/env bash
   set -euo pipefail
@@ -81,6 +85,7 @@ upload: _ssh-open (_generate-config "app.caddy")
   # Upload static files
   {{rsync}} {{public_dir}}/ {{ssh_user_host}}:{{www_dir}}/
 
+# Install and enable systemd service
 setup-systemd: _ssh-open (_generate-config "app.service")
   @echo '{{ACCENT}}Updating systemd configuration{{RESET}}'
 
@@ -91,28 +96,48 @@ setup-systemd: _ssh-open (_generate-config "app.service")
   {{systemctl}} daemon-reload
   {{systemctl}} enable {{DEPLOY_PROJECT_NAME}}
 
+# Restart the service
 restart: _ssh-open
   @echo '{{ACCENT}}Restarting {{DEPLOY_PROJECT_NAME}}{{RESET}}'
   {{systemctl}} restart {{DEPLOY_PROJECT_NAME}}
 
+# Start the service
 start: _ssh-open
   {{systemctl}} start {{DEPLOY_PROJECT_NAME}}
 
+# Stop the service
 stop: _ssh-open
   {{systemctl}} stop {{DEPLOY_PROJECT_NAME}}
 
+# Stop and disable the service (keeps files)
+disable: _ssh-open
+  @echo '{{ACCENT}}Disabling {{DEPLOY_PROJECT_NAME}}{{RESET}}'
+  {{systemctl}} stop {{DEPLOY_PROJECT_NAME}} || true
+  {{systemctl}} disable {{DEPLOY_PROJECT_NAME}}
+
+# Enable and start the service
+enable: _ssh-open
+  @echo '{{ACCENT}}Enabling {{DEPLOY_PROJECT_NAME}}{{RESET}}'
+  {{systemctl}} enable {{DEPLOY_PROJECT_NAME}}
+  {{systemctl}} start {{DEPLOY_PROJECT_NAME}}
+
+# Show service status
 status: _ssh-open
   {{systemctl}} status {{DEPLOY_PROJECT_NAME}}
 
+# Show service logs (pass args like -f, -n 100)
 logs *args: _ssh-open
   {{ssh-run}} journalctl -u {{DEPLOY_PROJECT_NAME}} {{args}}
 
+# Full deployment: build, upload, configure, and restart
 deploy: caddy::require vector::require mc::require release-production upload setup-systemd restart status caddy::restart vector::restart
   @echo '{{ACCENT}}Deploy complete{{RESET}}'
 
+# Show currently deployed version hash
 version: _ssh-open
   @{{ssh-run}} "readlink {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} | sed 's|.*/||;s|^{{DEPLOY_PROJECT_NAME}}\.||'"
 
+# Remove old binary versions, keeping latest 3
 prune: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail
@@ -123,6 +148,7 @@ prune: _ssh-open
 
   echo '{{SUCCESS}}Done{{RESET}}'
 
+# Remove service, configs, binaries, and all app data
 uninstall: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail
@@ -133,8 +159,9 @@ uninstall: _ssh-open
   {{systemctl}} disable {{DEPLOY_PROJECT_NAME}} || true
 
   {{ssh-run}} sudo rm -f /etc/systemd/system/{{DEPLOY_PROJECT_NAME}}.service
+  {{ssh-run}} sudo rm -f {{deploy_etc}}/caddy/sites.d/{{DEPLOY_PROJECT_NAME}}.caddy
   {{ssh-run}} sudo rm -f {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.*
-  {{ssh-run}} sudo rm -rf {{etc_dir}} {{www_dir}} {{lib_dir}}
+  {{ssh-run}} sudo rm -rf {{etc_dir}} {{www_dir}} {{lib_dir}} {{cache_dir}}
 
   {{systemctl}} daemon-reload
 

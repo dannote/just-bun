@@ -91,7 +91,12 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just repo collect|status|verify` — manage the local binary repository (see [The repository](#the-repository)).
 - `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy.
 - `just vector deploy|start|stop|restart|status` — manage the Vector log aggregator.
+- `just app start|stop|restart|status` — manage the app service.
+- `just app enable|disable` — enable or disable the app service (keeps files).
 - `just app logs <journalctl args>` — stream service logs (e.g. `just app logs -f`).
+- `just app version` — show currently deployed version hash.
+- `just app prune` — remove old binary versions, keeping latest 3.
+- `just app uninstall` — remove service, configs, binaries, and all app data.
 - `just db migrate|status|new|rollback` — manage database migrations with [Kysely](https://kysely.dev).
 - `just deploy` — build, upload, and restart everything in one command.
 

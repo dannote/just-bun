@@ -137,6 +137,36 @@ deploy: caddy::require vector::require mc::require release-production upload set
 version: _ssh-open
   @{{ssh-run}} "readlink {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} | sed 's|.*/||;s|^{{DEPLOY_PROJECT_NAME}}\.||'"
 
+# List available versions on server
+versions: _ssh-open
+  @{{ssh-run}} "ls -1t {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.* 2>/dev/null | sed 's|.*/{{DEPLOY_PROJECT_NAME}}\.||'"
+
+# Rollback to a previous version (defaults to previous git commit)
+rollback commit='': _ssh-open
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  if [ -n "{{commit}}" ]; then
+    target_hash="{{commit}}"
+  else
+    target_hash=$(git rev-parse --short HEAD~1)
+  fi
+
+  target_bin="{{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.$target_hash"
+
+  # Check if target binary exists
+  if ! {{ssh-run}} "test -f $target_bin"; then
+    echo "{{ERROR}}Version $target_hash not found{{RESET}}"
+    exit 1
+  fi
+
+  echo "{{ACCENT}}Rolling back to $target_hash{{RESET}}"
+
+  {{ssh-run}} sudo ln -sfn "$target_bin" {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}
+  {{systemctl}} restart {{DEPLOY_PROJECT_NAME}}
+
+  echo "{{SUCCESS}}Rolled back to $target_hash{{RESET}}"
+
 # Remove old binary versions, keeping latest 3
 prune: _ssh-open
   #!/usr/bin/env bash

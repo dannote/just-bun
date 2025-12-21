@@ -95,6 +95,8 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just app enable|disable` — enable or disable the app service (keeps files).
 - `just app logs <journalctl args>` — stream service logs (e.g. `just app logs -f`).
 - `just app version` — show currently deployed version hash.
+- `just app versions` — list all available versions on server.
+- `just app rollback [hash]` — rollback to previous version (or specific hash).
 - `just app prune` — remove old binary versions, keeping latest 3.
 - `just app uninstall` — remove service, configs, binaries, and all app data.
 - `just db migrate|status|new|rollback` — manage database migrations with [Kysely](https://kysely.dev).

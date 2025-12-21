@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - Kysely database layer with type-safe queries and bundled migrations
 - Database repository pattern in `lib/db/repo/` for query encapsulation
-- App service management commands: `enable`, `disable`, `uninstall`, `version`, `prune`
+- App service management commands: `enable`, `disable`, `uninstall`, `version`, `versions`, `rollback`, `prune`
 - OpenTelemetry tracing with OTLP export to any compatible backend
 - Local binary repository for managing Caddy, Vector, and mc binaries
 - Vector log aggregator with journald collection and S3 export

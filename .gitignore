@@ -5,9 +5,13 @@ node_modules
 .cache
 .output
 
+/data
+
 /.env
 /.env.local
 /.env.production
+
+*.db
 
 /repo
 

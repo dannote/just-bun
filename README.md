@@ -92,6 +92,7 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy.
 - `just vector deploy|start|stop|restart|status` — manage the Vector log aggregator.
 - `just app logs <journalctl args>` — stream service logs (e.g. `just app logs -f`).
+- `just db migrate|status|new|rollback` — manage database migrations with [Kysely](https://kysely.dev).
 - `just deploy` — build, upload, and restart everything in one command.
 
 ## Deployment (no Docker required)
@@ -123,6 +124,9 @@ The deployment follows standard [FHS](https://en.wikipedia.org/wiki/Filesystem_H
 ├── index.html
 ├── favicon.svg
 └── assets/
+
+/var/lib/just-bun/                    # app working directory
+└── app.db                            # SQLite database
 
 /var/cache/just-bun/                  # rsync target for delta transfers
 └── just-bun
@@ -160,6 +164,7 @@ This approach means you always know exactly what's running (it's right there in 
 
 ## Stack highlights
 - **[Bun](https://bun.sh) runtime**: fast start, built-in bundler, `bun:test`, `bun:sqlite`, native HTTP, and an S3-capable runtime without extra SDKs.
+- **[Kysely](https://kysely.dev)**: type-safe SQL query builder with migrations, wired to `bun:sqlite`.
 - **[Elysia](https://elysiajs.com) + [ArkType](https://arktype.io)**: ergonomic, typed HTTP handlers for the API surface.
 - **[Vue 3](https://vuejs.org) SFC + [Vite](https://vite.dev)**: auto-routed pages, hot reload, and TypeScript-first ergonomics.
 - **[shadcn-vue](https://www.shadcn-vue.com) + [Reka UI](https://reka-ui.com) + [CVA](https://beta.cva.style)**: accessible primitives with typed variants to keep props sane.

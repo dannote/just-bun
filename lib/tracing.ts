@@ -1,11 +1,15 @@
 import { trace, context } from '@opentelemetry/api'
-import { BasicTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
+import {
+  BasicTracerProvider,
+  BatchSpanProcessor
+} from '@opentelemetry/sdk-trace-base'
 import { resourceFromAttributes } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto'
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks'
 
-const OTLP_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://127.0.0.1:4318'
+const OTLP_ENDPOINT =
+  process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://127.0.0.1:4318'
 
 export function setupTracing(serviceName: string) {
   const contextManager = new AsyncLocalStorageContextManager()

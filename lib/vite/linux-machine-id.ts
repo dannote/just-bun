@@ -7,7 +7,11 @@ export function linuxMachineId(): Plugin {
   return {
     name: 'linux-machine-id',
     transform(_code, id) {
-      if (!id.includes('@opentelemetry/resources') || !id.endsWith('getMachineId.js')) return
+      if (
+        !id.includes('@opentelemetry/resources') ||
+        !id.endsWith('getMachineId.js')
+      )
+        return
 
       return dedent`
         import { promises as fs } from 'fs';

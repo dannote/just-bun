@@ -41,7 +41,7 @@ Here’s a rundown of the main technologies we use. For a deeper dive, we've inc
 - **Frontend:** The frontend is a [Vue 3](https://vuejs.org/) Single File Component (SFC) app. Components live in `app/components` and should be named using `PascalCase`.
 - **UI Components:** We use [shadcn-vue](https://www.shadcn-vue.com/) (built on [reka-ui](https://reka-ui.com/)) for shared UI pieces; add new ones with `just shadcn add <component-name>`. When a component isn't available via shadcn-vue, use reka-ui directly. shadcn-vue relies on CVA for its variant system. ([llms.txt for shadcn-vue](https://shadcn-vue.com/llms.txt), [llms.txt for reka-ui](https://reka-ui.com/llms.txt))
 - **Styling:** We use [Class Variance Authority (CVA)](https://beta.cva.style/) to manage component variants—including those from shadcn-vue. CVA is crucial for preventing "prop explosion" in components like `Button.vue` and for encapsulating complex styling logic that is unmanageable in `:class`. We accept the abstraction over `clsx` and `tailwind-merge` for the benefits of type-safety and structured, maintainable variants, which aligns with our code philosophy. ([llms.txt](https://beta.cva.style/llms.txt))
-- **Database:** We may use [DrizzleORM](https://orm.drizzle.team/) for database interactions. If you're working on the data layer, familiarize yourself with its conventions. ([llms.txt](https://orm.drizzle.team/llms.txt))
+- **Database:** We use [Kysely](https://kysely.dev/) as our type-safe SQL query builder with `bun:sqlite`. Migrations are managed via `just db` commands. ([llms.txt](https://kysely.dev/llms.txt))
 
 ### Deployment
 

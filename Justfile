@@ -11,6 +11,7 @@ mod caddy "recipes/accessories/caddy.just"
 mod vector "recipes/accessories/vector.just"
 mod mc "recipes/accessories/mc.just"
 mod app "recipes/app.just"
+mod db "recipes/db.just"
 mod shadcn "recipes/shadcn.just"
 mod repo "recipes/repo.just"
 

@@ -23,7 +23,8 @@ export default defineConfig({
     nitro({
       noExternals: true,
       serveStatic: false,
-      preset: 'bun'
+      preset: 'bun',
+      externals: ['bun:sqlite']
     }),
     tailwindcss(),
     vueRouter({ routesFolder: 'app/pages' }),

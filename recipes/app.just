@@ -20,7 +20,6 @@ hash := `git rev-parse --short HEAD`
 install:
   bun install
 
-# Convert linux-amd64 -> bun-linux-x64-baseline
 _bun-target target:
   #!/usr/bin/env bash
   set -euo pipefail
@@ -69,12 +68,8 @@ upload: _ssh-open (_generate-config "app.caddy")
 
   # Upload binary to cache_dir with stable name for delta transfer, then copy to bin
   {{rsync}} "$repo_path/{{DEPLOY_PROJECT_NAME}}.{{hash}}" {{ssh_user_host}}:{{cache_dir}}/{{DEPLOY_PROJECT_NAME}}
-
-  # Skip copy if version already exists (e.g. redeploying same commit)
-  if ! {{ssh-run}} test -f {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}; then
-    {{ssh-run}} sudo cp {{cache_dir}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
-    {{ssh-run}} sudo chmod +x {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
-  fi
+  {{ssh-run}} sudo cp {{cache_dir}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+  {{ssh-run}} sudo chmod +x {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
   {{ssh-run}} sudo ln -sfn {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}
 
   # Upload configs

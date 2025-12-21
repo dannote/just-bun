@@ -1,0 +1,21 @@
+{
+  log {
+    output stdout
+    format json
+  }
+}
+
+${DEPLOY_DOMAIN} {
+  header -Server
+
+  log {
+    output stdout
+    format json
+  }
+
+  root * ${DEPLOY_WWW}/${DEPLOY_PROJECT_NAME}
+  file_server
+
+  @app not file
+  reverse_proxy @app localhost:3000
+}

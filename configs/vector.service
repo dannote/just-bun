@@ -1,0 +1,23 @@
+[Unit]
+Description=Vector
+After=network.target
+
+[Service]
+Type=simple
+User=${DEPLOY_USER}
+Group=${DEPLOY_GROUP}
+
+ExecStart=${DEPLOY_BIN}/vector --config ${DEPLOY_ETC}/vector/vector.yaml
+Restart=on-failure
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=${DEPLOY_LIB}/vector
+
+[Install]
+WantedBy=multi-user.target

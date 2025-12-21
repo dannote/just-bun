@@ -36,7 +36,8 @@ Here’s a rundown of the main technologies we use. For a deeper dive, we've inc
 - **Runtime:** The project runs on [Bun](https://bun.sh/), a fast JavaScript runtime. ([llms.txt](https://bun.sh/llms.txt))
 - **Backend:** Our server is built with [Elysia](https://elysiajs.com/), a fast and ergonomic web framework. You'll find the main API routes in `server.ts`. ([llms.txt](https://elysiajs.com/llms.txt))
     - **Validation:** We use [ArkType](https://arktype.io/) for robust runtime type validation of API requests. ([llms.txt](https://arktype.io/llms.txt))
-    - **Logging:** For logging, we use `@logtape/logtape`. You can get a logger instance by using `getLogger`.
+    - **Logging:** We use `@logtape/logtape`. Get a logger instance with `getLogger`.
+    - **Tracing:** OpenTelemetry is configured in `lib/tracing.ts`. Traces export via OTLP to `OTEL_EXPORTER_OTLP_ENDPOINT`. A Vite plugin in `lib/vite/linux-machine-id.ts` patches OpenTelemetry's dynamic imports for Bun compatibility.
 - **Frontend:** The frontend is a [Vue 3](https://vuejs.org/) Single File Component (SFC) app. Components live in `app/components` and should be named using `PascalCase`.
 - **UI Components:** We use [shadcn-vue](https://www.shadcn-vue.com/) (built on [reka-ui](https://reka-ui.com/)) for shared UI pieces; add new ones with `just shadcn add <component-name>`. When a component isn't available via shadcn-vue, use reka-ui directly. shadcn-vue relies on CVA for its variant system. ([llms.txt for shadcn-vue](https://shadcn-vue.com/llms.txt), [llms.txt for reka-ui](https://reka-ui.com/llms.txt))
 - **Styling:** We use [Class Variance Authority (CVA)](https://beta.cva.style/) to manage component variants—including those from shadcn-vue. CVA is crucial for preventing "prop explosion" in components like `Button.vue` and for encapsulating complex styling logic that is unmanageable in `:class`. We accept the abstraction over `clsx` and `tailwind-merge` for the benefits of type-safety and structured, maintainable variants, which aligns with our code philosophy. ([llms.txt](https://beta.cva.style/llms.txt))
@@ -44,7 +45,14 @@ Here’s a rundown of the main technologies we use. For a deeper dive, we've inc
 
 ### Deployment
 
-We have a specific philosophy for deployment that prioritizes speed and simplicity. For a full explanation of how it works, please read the "Deployment" section in the `README.md` file.
+We prioritize speed and simplicity. Key points:
+
+- **Config templates** live in `configs/` (`.caddy`, `.service`, `.yaml`). They use `${VAR}` syntax and are processed via `_generate-config`.
+- **Delta transfers**: rsync uploads to a stable path in `/var/cache/` so only changed bytes transfer.
+- **Accessories**: Caddy and Vector are managed via `recipes/accessories/`. They have their own `deploy`, `restart`, `status` recipes.
+- **Observability**: Vector collects logs from journald and exports to S3. Traces go to the OTLP endpoint configured in `.env`.
+
+For the full deployment flow, read the "Deployment" section in `README.md`.
 
 ### Documentation Style
 

@@ -24,7 +24,7 @@ I was tired of waiting on slow Docker builds and container registries for every 
 - Minimal DevOps: build a single executable, [rsync](https://rsync.samba.org), and let [systemd](https://systemd.io) + [Caddy](https://caddyserver.com) keep it running—no images or registries required.
 
 ## Getting started
-Call it **Just Bun!** because the happy path is literally: install `just`, run `just bun`, and boom—you've got “Just Bun!”.
+Call it **Just Bun!** because the happy path is literally: install `just`, run `just bun`, and boom—you've got "Just Bun!".
 
 You can grab it directly with Bun or just™ clone it—your call.
 
@@ -88,54 +88,75 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just format` / `just lint` — [Biome](https://biomejs.dev) + [oxlint](https://oxc-project.github.io/oxlint/) for consistency.
 - `just app release` — compile the server to a static Bun binary in `releases/`.
 - `just ssh` — open an interactive shell on the deploy target.
-- `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy helper.
+- `just repo collect|status|verify` — manage the local binary repository (see [The repository](#the-repository)).
+- `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy.
+- `just vector deploy|start|stop|restart|status` — manage the Vector log aggregator.
 - `just app logs <journalctl args>` — stream service logs (e.g. `just app logs -f`).
-- `just deploy` — alias of `app::deploy` to push a build to your server.
+- `just deploy` — build, upload, and restart everything in one command.
 
 ## Deployment (no Docker required)
-This starter compiles the backend into a single executable with [`bun build --compile`](https://bun.sh/docs/bundler/executables). Deployment is a quick [rsync](https://rsync.samba.org) plus a symlink flip driven by the `recipes/app.just` targets. [systemd](https://systemd.io) keeps the process healthy, and [Caddy](https://caddyserver.com) (see `Caddyfile`) can front it with TLS. Roll back by pointing the symlink at the previous binary—no registries, layers, or cold image pulls.
+This starter compiles the backend into a single executable with [`bun build --compile`](https://bun.sh/docs/bundler/executables). Deployment uses [rsync](https://rsync.samba.org) with delta transfers—only changed bytes are uploaded, making iterative deploys fast even for large binaries. A symlink flip enables instant rollback to any previous version. [systemd](https://systemd.io) keeps the process healthy, and [Caddy](https://caddyserver.com) fronts it with automatic TLS.
 
-Caddy will fetch and renew Let's Encrypt certificates automatically for any host
-in the `Caddyfile` as soon as DNS points at your server; the first HTTPS check
-may take a few seconds while ACME completes.
+Caddy fetches and renews Let's Encrypt certificates automatically for any configured domain as soon as DNS points at your server. Service templates live in `configs/`, keeping secrets out of version control.
 
-The generated `app.service` applies systemd hardening flags
-(`ProtectSystem=strict`, `ProtectHome=yes`, `PrivateTmp=yes`,
-`PrivateDevices=yes`, `ProtectKernelTunables=yes`, `ProtectKernelModules=yes`,
-`ProtectControlGroups=yes`). Binaries live in `bin/`, config in `etc/`, and
-static files in `public/`.
-
-Here’s what the directory structure can look like on the server:
+The deployment follows standard [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) paths:
 
 ```
-/opt
+/usr/local/bin/
+├── just-bun -> just-bun.a1b2c3d      # symlink to current version
+├── just-bun.a1b2c3d                  # current binary
+├── just-bun.f4e5d6c                  # previous version (instant rollback)
 ├── caddy
-│   ├── Caddyfile
-│   ├── caddy
-│   └── caddy.service
-└── projects
-    └── just-bun
-        ├── app.service
-        ├── bin
-        │   ├── server -> /opt/projects/just-bun/bin/server.f977374
-        │   ├── server.433db9e
-        │   ├── server.8503300
-        │   ├── server.a6aa7bf
-        │   ├── server.f78495a
-        │   ├── server.f977374
-        │   └── server.latest
-        ├── etc
-        │   ├── Caddyfile
-        │   └── vars.caddy
-        └── public
-            ├── assets
-            │   ├── elysia-BWovwTWN.svg
-            │   ├── index-6YzeFRVx.css
-            │   ├── index-DNvYkrHy.js
-            │   └── pages-B7j4pB_e.js
-            ├── favicon.svg
-            └── robots.txt
+└── vector
+
+/etc/
+├── just-bun/
+│   └── .env.production
+├── caddy/
+│   ├── Caddyfile
+│   └── sites.d/
+│       └── just-bun.caddy
+└── vector/
+    └── vector.yaml
+
+/var/www/just-bun/                    # static assets served by Caddy
+├── index.html
+├── favicon.svg
+└── assets/
+
+/var/cache/just-bun/                  # rsync target for delta transfers
+└── just-bun
 ```
+
+## The repository
+
+Docker solved dependency distribution by bundling everything into container images. But images are opaque blobs that hide what's actually running, require a registry to host, and add cold-start latency. This starter takes a different approach: static binaries distributed directly.
+
+The `repo/` directory is a local binary repository organized by platform. Instead of pulling container images, you collect verified binaries once and rsync them to your servers:
+
+```bash
+just repo collect        # download and verify all binaries
+just repo status         # see what's in your local repo
+just repo verify         # re-verify checksums
+```
+
+Each binary is version-pinned and checksum-verified against upstream signatures. The repo structure mirrors target platforms, so you can cross-deploy from any development machine:
+
+```
+repo/
+├── linux/
+│   └── amd64/
+│       ├── caddy.2.10.2
+│       ├── caddy.2.10.2.sig
+│       ├── vector.0.52.0
+│       ├── vector.0.52.0.sig
+│       └── just-bun.a1b2c3d
+└── darwin/
+    └── arm64/
+        └── ...
+```
+
+This approach means you always know exactly what's running (it's right there in `repo/`), deployments are reproducible without network access to registries, and there's no container runtime overhead. Your app, Caddy, Vector, and any other tools are just executables managed by systemd.
 
 ## Stack highlights
 - **[Bun](https://bun.sh) runtime**: fast start, built-in bundler, `bun:test`, `bun:sqlite`, native HTTP, and an S3-capable runtime without extra SDKs.
@@ -144,6 +165,8 @@ Here’s what the directory structure can look like on the server:
 - **[shadcn-vue](https://www.shadcn-vue.com) + [Reka UI](https://reka-ui.com) + [CVA](https://beta.cva.style)**: accessible primitives with typed variants to keep props sane.
 - **[Unhead](https://unhead.unjs.io)**: declarative head/meta management for Vue out of the box.
 - **[Logtape](https://logtape.dev)**: structured logging wired for console in dev and syslog in production.
+- **[OpenTelemetry](https://opentelemetry.io)**: distributed tracing with OTLP export to any compatible backend.
+- **[Vector](https://vector.dev)**: log aggregation from journald with S3 export for observability.
 
 ## What you get out of the box
 - A home page that showcases the stack and links you to the docs and API example.

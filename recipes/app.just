@@ -1,143 +1,146 @@
 import "./ssh.just"
 import "./colors.just"
 import "./vite.just"
+import "./config.just"
 
-mod caddy "./caddy.just"
+mod caddy "./accessories/caddy.just"
+mod vector "./accessories/vector.just"
+mod mc "./accessories/mc.just"
 
-root := justfile_directory()
-
-releases_dir := root + "/releases"
-configs_dir := root + "/configs"
-generated_configs_dir := configs_dir + "/generated"
+repo_dir := root + "/repo"
 public_dir := root + "/.output/public"
 
-project_name := env("DEPLOY_PROJECT_NAME", "just-bun")
-deploy_project_dir := env("DEPLOY_PROJECTS_DIR", "/opt/projects") + "/" + project_name
-deploy_bin_dir := deploy_project_dir + "/bin"
-deploy_etc_dir := deploy_project_dir + "/etc"
-
-export DEPLOY_PROJECT_DIR := deploy_project_dir
-
-service := '''
-[Unit]
-Description=$DEPLOY_PROJECT_NAME app service
-After=network.target
-
-[Service]
-Type=simple
-User=$DEPLOY_USER
-Group=$DEPLOY_GROUP
-
-WorkingDirectory=$DEPLOY_PROJECT_DIR
-EnvironmentFile=-$DEPLOY_PROJECT_DIR/.env
-EnvironmentFile=-$DEPLOY_PROJECT_DIR/.env.production
-ExecStart=$DEPLOY_PROJECT_DIR/bin/server
-
-Restart=on-failure
-
-ProtectSystem=strict
-ProtectHome=yes
-PrivateTmp=yes
-PrivateDevices=yes
-ProtectKernelTunables=yes
-ProtectKernelModules=yes
-ProtectControlGroups=yes
-
-[Install]
-WantedBy=multi-user.target
-'''
-
-caddy_vars := '''
-vars {
-  public $DEPLOY_PROJECT_DIR/public
-}
-'''
+etc_dir := deploy_etc + "/" + DEPLOY_PROJECT_NAME
+www_dir := deploy_www + "/" + DEPLOY_PROJECT_NAME
+lib_dir := deploy_lib + "/" + DEPLOY_PROJECT_NAME
+cache_dir := deploy_cache + "/" + DEPLOY_PROJECT_NAME
 
 hash := `git rev-parse --short HEAD`
 
 install:
   bun install
 
-release platform='': build
-  mkdir -p {{releases_dir}}
+# Convert linux-amd64 -> bun-linux-x64-baseline
+_bun-target target:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  IFS='-' read -r os arch <<< "{{target}}"
+  [[ "$arch" == "amd64" ]] && arch="x64"
+  [[ "$os" == "linux" && "$arch" == "x64" ]] && arch="x64-baseline"
+  echo "bun-$os-$arch"
 
-  bun build \
-    --compile {{root}}/.output/server/index.mjs \
+release target='': build
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  if [ -n "{{target}}" ]; then
+    repo_path="{{repo_dir}}/{{replace(target, "-", "/")}}"
+    bun_target=$(just app _bun-target {{target}})
+    target_flag="--target=$bun_target"
+  else
+    repo_path="{{repo_dir}}/local"
+    target_flag=""
+  fi
+
+  mkdir -p "$repo_path"
+
+  bun build --compile {{root}}/.output/server/index.mjs \
     --compile-autoload-dotenv \
-    --outfile {{releases_dir}}/server{{ if platform != '' { "." + platform } else { "" } }} \
-    {{ if platform != '' { "--target=bun-" + platform } else { "" } }}
+    $target_flag \
+    --outfile "$repo_path/{{DEPLOY_PROJECT_NAME}}.{{hash}}"
+
+  echo '{{SUCCESS}}Built {{DEPLOY_PROJECT_NAME}}.{{hash}}{{RESET}}'
 
 release-production:
   @echo '{{ACCENT}}Building release for target: $DEPLOY_TARGET{{RESET}}'
-  
   just app release $DEPLOY_TARGET
 
-upload: _ssh-open
-  @echo '{{ACCENT}}Uploading release artifacts and configuration{{RESET}}'
-  
-  {{ssh-run}} sudo mkdir -p {{deploy_project_dir}} {{deploy_bin_dir}} {{deploy_etc_dir}}
-  {{ssh-run}} sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP {{deploy_project_dir}}
-  {{ssh-run}} sudo chmod g+s {{deploy_project_dir}} {{deploy_bin_dir}} {{deploy_etc_dir}}
+upload: _ssh-open (_generate-config "app.caddy")
+  #!/usr/bin/env bash
+  set -euo pipefail
 
-  {{rsync}} {{root}}/Caddyfile {{ssh_user_host}}:{{deploy_etc_dir}}/Caddyfile
-  if [ -f "{{root}}/.env.production" ]; then {{rsync}} {{root}}/.env.production {{ssh_user_host}}:{{deploy_project_dir}}; fi
+  echo '{{ACCENT}}Uploading release{{RESET}}'
 
-  {{rsync}} {{releases_dir}}/server.$DEPLOY_TARGET {{ssh_user_host}}:{{deploy_bin_dir}}/server.latest
+  repo_path="{{repo_dir}}/${DEPLOY_TARGET/-//}"
 
-  {{rsync}} {{public_dir}}/ {{ssh_user_host}}:{{deploy_project_dir}}/public/
+  # Create directories
+  {{ssh-run}} sudo mkdir -p {{etc_dir}} {{www_dir}} {{lib_dir}} {{cache_dir}}
+  {{ssh-run}} sudo chown $DEPLOY_USER:$DEPLOY_GROUP {{etc_dir}} {{www_dir}} {{lib_dir}} {{cache_dir}}
 
-  {{ssh-run}} chmod +x {{deploy_bin_dir}}/server.latest
-  {{ssh-run}} cp -n {{deploy_bin_dir}}/server.latest {{deploy_bin_dir}}/server.{{hash}}
-  {{ssh-run}} ln -sfn {{deploy_bin_dir}}/server.{{hash}} {{deploy_bin_dir}}/server
+  # Upload binary to cache_dir with stable name for delta transfer, then copy to bin
+  {{rsync}} "$repo_path/{{DEPLOY_PROJECT_NAME}}.{{hash}}" {{ssh_user_host}}:{{cache_dir}}/{{DEPLOY_PROJECT_NAME}}
 
-_generate-service:
-  printf "%s" "{{service}}" > {{generated_configs_dir}}/app.service
+  # Skip copy if version already exists (e.g. redeploying same commit)
+  if ! {{ssh-run}} test -f {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}; then
+    {{ssh-run}} sudo cp {{cache_dir}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+    {{ssh-run}} sudo chmod +x {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+  fi
+  {{ssh-run}} sudo ln -sfn {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}
 
-_generate-caddy-vars:
-  printf "%s" "{{caddy_vars}}" > {{generated_configs_dir}}/vars.caddy
+  # Upload configs
+  {{rsync}} {{generated_dir}}/app.caddy {{ssh_user_host}}:{{deploy_etc}}/caddy/sites.d/{{DEPLOY_PROJECT_NAME}}.caddy
+  if [ -f "{{root}}/.env.production" ]; then
+    {{rsync}} {{root}}/.env.production {{ssh_user_host}}:{{etc_dir}}/.env.production
+  fi
 
-setup-systemd: _generate-service _generate-caddy-vars
+  # Upload static files
+  {{rsync}} {{public_dir}}/ {{ssh_user_host}}:{{www_dir}}/
+
+setup-systemd: _ssh-open (_generate-config "app.service")
   @echo '{{ACCENT}}Updating systemd configuration{{RESET}}'
-  
-  {{rsync}} {{generated_configs_dir}}/app.service {{ssh_user_host}}:{{deploy_project_dir}}/app.service
-  {{rsync}} {{generated_configs_dir}}/vars.caddy {{ssh_user_host}}:{{deploy_etc_dir}}/vars.caddy
 
-  {{ssh-run}} sudo ln -sfn {{deploy_project_dir}}/app.service /etc/systemd/system/{{project_name}}.service
+  {{rsync}} {{generated_dir}}/app.service {{ssh_user_host}}:/tmp/{{DEPLOY_PROJECT_NAME}}.service
+
+  {{ssh-run}} sudo mv /tmp/{{DEPLOY_PROJECT_NAME}}.service /etc/systemd/system/{{DEPLOY_PROJECT_NAME}}.service
 
   {{systemctl}} daemon-reload
-  {{systemctl}} enable {{project_name}}
+  {{systemctl}} enable {{DEPLOY_PROJECT_NAME}}
 
 restart: _ssh-open
-  @echo '{{ACCENT}}Restarting service {{project_name}}{{RESET}}'
-  
-  {{systemctl}} restart {{project_name}}
+  @echo '{{ACCENT}}Restarting {{DEPLOY_PROJECT_NAME}}{{RESET}}'
+  {{systemctl}} restart {{DEPLOY_PROJECT_NAME}}
 
 start: _ssh-open
-  {{systemctl}} start {{project_name}}
+  {{systemctl}} start {{DEPLOY_PROJECT_NAME}}
 
 stop: _ssh-open
-  {{systemctl}} stop {{project_name}}
+  {{systemctl}} stop {{DEPLOY_PROJECT_NAME}}
 
 status: _ssh-open
-  {{systemctl}} status {{project_name}}
+  {{systemctl}} status {{DEPLOY_PROJECT_NAME}}
 
 logs *args: _ssh-open
-  {{ssh-run}} journalctl -u {{project_name}} {{args}}
+  {{ssh-run}} journalctl -u {{DEPLOY_PROJECT_NAME}} {{args}}
 
-deploy: caddy::require release-production upload setup-systemd restart status
-  @echo '{{ACCENT}}Restarting caddy to reload configs{{RESET}}'
-  
-  just caddy restart
+deploy: caddy::require vector::require mc::require release-production upload setup-systemd restart status caddy::restart vector::restart
+  @echo '{{ACCENT}}Deploy complete{{RESET}}'
 
 version: _ssh-open
-  {{ssh-run}} "cd {{deploy_bin_dir}} && basename \$(readlink server) | sed 's/^server\.//'"
+  @{{ssh-run}} "readlink {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} | sed 's|.*/||;s|^{{DEPLOY_PROJECT_NAME}}\.||'"
 
 prune: _ssh-open
-  #!/bin/bash
+  #!/usr/bin/env bash
+  set -euo pipefail
 
-  {{ssh-run}} '
-    ls -1t {{deploy_bin_dir}}/server.* 2>/dev/null \
-    | tail -n +4 \
-    | grep -v \"server.{{hash}}\" \
-    | xargs -r rm -f
-  '
+  echo '{{ACCENT}}Pruning old versions{{RESET}}'
+
+  {{ssh-run}} 'ls -1t {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.* 2>/dev/null | tail -n +4 | xargs -r sudo rm -f'
+
+  echo '{{SUCCESS}}Done{{RESET}}'
+
+uninstall: _ssh-open
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  echo '{{WARNING}}Uninstalling {{DEPLOY_PROJECT_NAME}}...{{RESET}}'
+
+  {{systemctl}} stop {{DEPLOY_PROJECT_NAME}} || true
+  {{systemctl}} disable {{DEPLOY_PROJECT_NAME}} || true
+
+  {{ssh-run}} sudo rm -f /etc/systemd/system/{{DEPLOY_PROJECT_NAME}}.service
+  {{ssh-run}} sudo rm -f {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.*
+  {{ssh-run}} sudo rm -rf {{etc_dir}} {{www_dir}} {{lib_dir}}
+
+  {{systemctl}} daemon-reload
+
+  echo '{{SUCCESS}}{{DEPLOY_PROJECT_NAME}} uninstalled{{RESET}}'

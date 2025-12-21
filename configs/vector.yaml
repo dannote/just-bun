@@ -1,0 +1,60 @@
+# Vector configuration for observability pipeline
+# Receives OTLP traces from the app and logs from journald
+
+sources:
+  # OTLP traces from Elysia app
+  otlp:
+    type: opentelemetry
+    grpc:
+      address: "127.0.0.1:4317"
+    http:
+      address: "127.0.0.1:4318"
+
+  # Journald logs from systemd services
+  journald:
+    type: journald
+    include_units:
+      - caddy
+      - ${DEPLOY_PROJECT_NAME}
+
+transforms:
+  # Parse and enrich logs
+  logs:
+    type: remap
+    inputs:
+      - journald
+    source: |
+      .service = .UNIT
+      del(._HOSTNAME)
+      del(.__REALTIME_TIMESTAMP)
+      del(.__MONOTONIC_TIMESTAMP)
+
+sinks:
+  # Console output for debugging
+  console:
+    type: console
+    inputs:
+      - logs
+      - otlp.logs
+      - otlp.traces
+    encoding:
+      codec: json
+
+  # File output for traces
+  traces_file:
+    type: file
+    inputs:
+      - otlp.traces
+    path: "${DEPLOY_LIB}/vector/traces/%Y-%m-%d.json"
+    encoding:
+      codec: json
+
+  # File output for logs
+  logs_file:
+    type: file
+    inputs:
+      - logs
+      - otlp.logs
+    path: "${DEPLOY_LIB}/vector/logs/%Y-%m-%d.json"
+    encoding:
+      codec: json

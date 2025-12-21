@@ -1,0 +1,24 @@
+[Unit]
+Description=Caddy
+After=network.target
+
+[Service]
+Type=simple
+User=${DEPLOY_USER}
+Group=${DEPLOY_GROUP}
+
+Environment=XDG_DATA_HOME=${DEPLOY_LIB}/caddy/data
+ExecStart=${DEPLOY_BIN}/caddy run --config ${DEPLOY_ETC}/caddy/Caddyfile
+Restart=on-failure
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=${DEPLOY_LIB}/caddy
+
+[Install]
+WantedBy=multi-user.target

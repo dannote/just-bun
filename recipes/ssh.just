@@ -4,8 +4,15 @@ ssh_run_opts := "-o ControlMaster=auto " + ssh_base_opts
 ssh_user_host := "$DEPLOY_USER@$DEPLOY_HOST"
 
 ssh-run := "ssh " + ssh_run_opts + " -C " + ssh_user_host + " --"
-rsync := "rsync -avz --progress -e \"ssh " + ssh_run_opts + "\""
+rsync := "rsync -avz --inplace --progress -e \"ssh " + ssh_run_opts + "\""
 systemctl := ssh-run + " sudo systemctl"
+
+# Deploy paths
+deploy_bin := env('DEPLOY_BIN_PATH', '/usr/local/bin')
+deploy_etc := env('DEPLOY_ETC_PATH', '/etc')
+deploy_www := env('DEPLOY_WWW_PATH', '/var/www')
+deploy_lib := env('DEPLOY_LIB_PATH', '/var/lib')
+deploy_cache := env('DEPLOY_CACHE_PATH', '/var/cache')
 
 _ssh-open:
   #!/usr/bin/env bash

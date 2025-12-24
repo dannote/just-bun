@@ -1,5 +1,10 @@
+ssh_port := env('DEPLOY_SSH_PORT', '22')
+ssh_key := env('DEPLOY_SSH_KEY', '')
+ssh_extra_opts := env('DEPLOY_SSH_OPTS', '')
 ssh_control_path := "$HOME/.ssh/ctl-%r@%h:%p"
-ssh_base_opts := "-o ControlPersist=10m -o ControlPath=" + ssh_control_path
+ssh_port_opt := if ssh_port == "22" { "" } else { "-p " + ssh_port }
+ssh_key_opt := if ssh_key == "" { "" } else { "-i " + ssh_key }
+ssh_base_opts := "-o ControlPersist=10m -o ControlPath=" + ssh_control_path + " " + ssh_port_opt + " " + ssh_key_opt + " " + ssh_extra_opts
 ssh_run_opts := "-o ControlMaster=auto " + ssh_base_opts
 ssh_user_host := "$DEPLOY_USER@$DEPLOY_HOST"
 

@@ -14,6 +14,7 @@ mod app "recipes/app.just"
 mod db "recipes/db.just"
 mod shadcn "recipes/shadcn.just"
 mod repo "recipes/repo.just"
+mod e2e "recipes/e2e/e2e.just"
 
 alias install := app::install
 alias release := app::release

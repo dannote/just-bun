@@ -2,7 +2,8 @@
   "files.associations": {
     "*.css": "tailwindcss",
     "*.just": "just",
-    "*.caddy": "caddyfile"
+    "*.caddy": "caddyfile",
+    "*.bats": "shellscript"
   },
   "typescript.experimental.useTsgo": true,
   "editor.defaultFormatter": "biomejs.biome",

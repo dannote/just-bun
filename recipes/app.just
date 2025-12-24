@@ -58,22 +58,37 @@ release-production:
   just app release $DEPLOY_TARGET
 
 # Upload binary, configs, and static files to server
-upload: _ssh-open (_generate-config "app.caddy")
+# Use --force to overwrite existing binary (stops service temporarily)
+upload *args: _ssh-open (_generate-config "app.caddy")
   #!/usr/bin/env bash
   set -euo pipefail
+
+  force=false
+  for arg in {{args}}; do
+    [[ "$arg" == "--force" || "$arg" == "-f" ]] && force=true
+  done
 
   echo '{{ACCENT}}Uploading release{{RESET}}'
 
   repo_path="{{repo_dir}}/${DEPLOY_TARGET/-//}"
 
   # Create directories
-  {{ssh-run}} sudo mkdir -p {{etc_dir}} {{www_dir}} {{lib_dir}} {{cache_dir}}
-  {{ssh-run}} sudo chown $DEPLOY_USER:$DEPLOY_GROUP {{etc_dir}} {{www_dir}} {{lib_dir}} {{cache_dir}}
+  {{ssh-run}} sudo mkdir -p {{etc_dir}} {{deploy_etc}}/caddy/sites.d {{www_dir}} {{lib_dir}} {{cache_dir}}
+  {{ssh-run}} sudo chown $DEPLOY_USER:$DEPLOY_GROUP {{etc_dir}} {{deploy_etc}}/caddy/sites.d {{www_dir}} {{lib_dir}} {{cache_dir}}
 
   # Upload binary to cache_dir with stable name for delta transfer, then copy to bin
   {{rsync}} "$repo_path/{{DEPLOY_PROJECT_NAME}}.{{hash}}" {{ssh_user_host}}:{{cache_dir}}/{{DEPLOY_PROJECT_NAME}}
-  {{ssh-run}} sudo cp {{cache_dir}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
-  {{ssh-run}} sudo chmod +x {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+
+  # Copy binary unless it already exists (use --force to overwrite)
+  if {{ssh-run}} test -f {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}} && ! $force; then
+    echo '{{SUCCESS}}Binary already exists, skipping copy{{RESET}}'
+  else
+    $force && echo '{{WARNING}}Force mode: stopping service to overwrite binary{{RESET}}'
+    $force && {{systemctl}} stop {{DEPLOY_PROJECT_NAME}} 2>/dev/null || true
+    {{ssh-run}} sudo cp {{cache_dir}}/{{DEPLOY_PROJECT_NAME}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+    {{ssh-run}} sudo chmod +x {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}}
+    $force && {{systemctl}} start {{DEPLOY_PROJECT_NAME}} 2>/dev/null || true
+  fi
   {{ssh-run}} sudo ln -sfn {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}.{{hash}} {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}}
 
   # Upload configs
@@ -130,7 +145,8 @@ logs *args: _ssh-open
   {{ssh-run}} journalctl -u {{DEPLOY_PROJECT_NAME}} {{args}}
 
 # Full deployment: build, upload, configure, and restart
-deploy: caddy::require vector::require mc::require release-production upload setup-systemd restart status caddy::restart vector::restart
+# Use --force/-f to overwrite existing binary (stops service temporarily)
+deploy *args: caddy::require vector::require mc::require release-production (upload args) setup-systemd restart status caddy::restart vector::restart
   @echo '{{ACCENT}}Deploy complete{{RESET}}'
 
 # Show currently deployed version hash

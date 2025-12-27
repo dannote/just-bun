@@ -21,6 +21,7 @@ apps := "caddy mc vector"
 
 alias list := info
 
+# Show info about available binaries
 info app='all':
   #!/usr/bin/env bash
   set -euo pipefail
@@ -31,6 +32,7 @@ info app='all':
     just repo {{app}} info
   fi
 
+# Download and verify binaries
 collect app='all':
   #!/usr/bin/env bash
   set -euo pipefail
@@ -41,6 +43,7 @@ collect app='all':
     just repo {{app}} collect
   fi
 
+# Verify binary checksums
 verify app='all':
   #!/usr/bin/env bash
   set -euo pipefail
@@ -51,9 +54,11 @@ verify app='all':
     just repo {{app}} verify
   fi
 
+# Collect and verify all binaries
 build: (collect "all") (verify "all")
   @echo '{{SUCCESS}}Repo build complete{{RESET}}'
 
+# Show repository contents
 status:
   #!/usr/bin/env bash
   set -euo pipefail

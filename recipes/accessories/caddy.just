@@ -9,6 +9,7 @@ repo_path := root + "/repo/linux/amd64"
 etc_dir := deploy_etc + "/caddy"
 lib_dir := deploy_lib + "/caddy"
 
+# Ensure Caddy is installed
 require: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail
@@ -21,6 +22,7 @@ require: _ssh-open
   echo '{{WARNING}}Caddy not found, installing...{{RESET}}'
   just caddy deploy
 
+# Upload Caddy binary to server
 upload: _ssh-open
   {{ssh-run}} sudo mkdir -p {{etc_dir}} {{etc_dir}}/sites.d {{lib_dir}}
   {{ssh-run}} sudo chown $DEPLOY_USER:$DEPLOY_GROUP {{etc_dir}}/sites.d {{lib_dir}}
@@ -32,6 +34,7 @@ upload: _ssh-open
   {{ssh-run}} sudo ln -sfn {{deploy_bin}}/caddy.{{version}} {{deploy_bin}}/caddy
   {{ssh-run}} sudo setcap 'cap_net_bind_service=+ep' {{deploy_bin}}/caddy.{{version}}
 
+# Install systemd service
 setup-systemd: _ssh-open (_generate-config "caddy.service") (_generate-config "main.caddy")
   {{rsync}} {{generated_dir}}/caddy.service {{ssh_user_host}}:/tmp/caddy.service
   {{rsync}} {{generated_dir}}/main.caddy {{ssh_user_host}}:/tmp/Caddyfile
@@ -42,8 +45,10 @@ setup-systemd: _ssh-open (_generate-config "caddy.service") (_generate-config "m
   {{systemctl}} daemon-reload
   {{systemctl}} enable caddy
 
+# Deploy Caddy to server
 deploy: upload setup-systemd
 
+# Remove Caddy from server
 uninstall: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail

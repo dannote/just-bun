@@ -101,6 +101,17 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just app uninstall` — remove service, configs, binaries, and all app data.
 - `just db migrate|status|new|rollback` — manage database migrations with [Kysely](https://kysely.dev).
 - `just deploy` — build, upload, and restart everything in one command.
+- `just e2e test` — run end-to-end deployment tests against a local container.
+- `just e2e clean` — tear down the test container and cleanup.
+- `just e2e ssh` — SSH into the test container for debugging.
+
+## End-to-end tests
+
+The deployment workflow has a lot of moving parts: building binaries, uploading via rsync, managing symlinks, configuring systemd, and coordinating restarts. To verify everything works together, the `recipes/e2e/` directory contains a full end-to-end test suite.
+
+The tests spin up a Fedora container with systemd (via Docker) that mimics a real production server. They then run through the entire deployment lifecycle—build, release, upload, service setup, start/stop, rollback, and cleanup—verifying each step works correctly. This catches integration issues that unit tests miss, like permission problems, missing dependencies, or broken systemd configurations.
+
+Tests are written in [Bats](https://github.com/bats-core/bats-core) (Bash Automated Testing System), which keeps them readable and close to the actual shell commands you'd run manually. Run `just e2e test` to execute the full suite, or use `just e2e ssh` to drop into the test container for debugging.
 
 ## Deployment (no Docker required)
 This starter compiles the backend into a single executable with [`bun build --compile`](https://bun.sh/docs/bundler/executables). Deployment uses [rsync](https://rsync.samba.org) with delta transfers—only changed bytes are uploaded, making iterative deploys fast even for large binaries. A symlink flip enables instant rollback to any previous version. [systemd](https://systemd.io) keeps the process healthy, and [Caddy](https://caddyserver.com) fronts it with automatic TLS.

@@ -8,6 +8,7 @@ repo_path := root + "/repo/linux/amd64"
 
 export DEPLOY_BIN := deploy_bin
 
+# Ensure mc is installed
 require: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail
@@ -20,6 +21,7 @@ require: _ssh-open
   echo '{{WARNING}}mc not found, installing...{{RESET}}'
   just mc deploy
 
+# Deploy mc to server
 deploy: _ssh-open
   {{rsync}} {{repo_path}}/mc.{{version}} {{ssh_user_host}}:/tmp/mc.{{version}}
 
@@ -29,6 +31,7 @@ deploy: _ssh-open
 
   echo '{{SUCCESS}}mc deployed{{RESET}}'
 
+# Remove mc from server
 uninstall: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail

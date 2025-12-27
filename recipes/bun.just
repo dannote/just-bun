@@ -1,5 +1,6 @@
 import "./colors.just"
 
+# Install Bun if not available
 bun:
   #!/usr/bin/env bash
 

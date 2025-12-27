@@ -1,5 +1,6 @@
 import "../colors.just"
 
+# Test container management
 mod vm "./vm.just"
 
 root_dir := justfile_directory()
@@ -28,3 +29,7 @@ test: vm::up _load-env
 # Cleanup after tests
 clean: vm::down
   rm -f "{{root_dir}}/.env.e2e"
+
+# SSH into the test container
+ssh *args:
+  @just e2e::vm::ssh {{args}}

@@ -3,8 +3,11 @@ import "./colors.just"
 import "./vite.just"
 import "./config.just"
 
+# Caddy reverse proxy
 mod caddy "./accessories/caddy.just"
+# Vector log aggregator
 mod vector "./accessories/vector.just"
+# MinIO client
 mod mc "./accessories/mc.just"
 
 repo_dir := root + "/repo"

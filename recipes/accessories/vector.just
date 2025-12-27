@@ -9,6 +9,7 @@ repo_path := root + "/repo/linux/amd64"
 etc_dir := deploy_etc + "/vector"
 lib_dir := deploy_lib + "/vector"
 
+# Ensure Vector is installed
 require: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail
@@ -21,6 +22,7 @@ require: _ssh-open
   echo '{{WARNING}}Vector not found, installing...{{RESET}}'
   just vector deploy
 
+# Upload Vector binary to server
 upload: _ssh-open
   {{ssh-run}} sudo mkdir -p {{etc_dir}} {{lib_dir}}
   {{ssh-run}} sudo chown $DEPLOY_USER:$DEPLOY_GROUP {{lib_dir}}
@@ -31,6 +33,7 @@ upload: _ssh-open
   {{ssh-run}} sudo chmod +x {{deploy_bin}}/vector.{{version}}
   {{ssh-run}} sudo ln -sfn {{deploy_bin}}/vector.{{version}} {{deploy_bin}}/vector
 
+# Install systemd service
 setup-systemd: _ssh-open (_generate-config "vector.service") (_generate-config "vector.yaml")
   {{rsync}} {{generated_dir}}/vector.service {{ssh_user_host}}:/tmp/vector.service
   {{rsync}} {{generated_dir}}/vector.yaml {{ssh_user_host}}:/tmp/vector.yaml
@@ -41,8 +44,10 @@ setup-systemd: _ssh-open (_generate-config "vector.service") (_generate-config "
   {{systemctl}} daemon-reload
   {{systemctl}} enable vector
 
+# Deploy Vector to server
 deploy: upload setup-systemd
 
+# Remove Vector from server
 uninstall: _ssh-open
   #!/usr/bin/env bash
   set -euo pipefail

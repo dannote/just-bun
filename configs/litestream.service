@@ -1,0 +1,16 @@
+[Unit]
+Description=Litestream SQLite Replication
+After=network.target
+
+[Service]
+Type=simple
+# Run as root to read databases owned by different users
+User=root
+
+ExecStart=${DEPLOY_BIN}/litestream replicate -config ${DEPLOY_ETC}/litestream/litestream.yaml
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

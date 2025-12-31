@@ -1,46 +1,9 @@
 #!/usr/bin/env bats
 
 # E2E Tests for Deployment Commands
-# Run with: just e2e::test
+# Run with: just e2e test
 
-# ============================================================================
-# Setup and Helpers
-# ============================================================================
-
-setup_file() {
-  # Re-export deploy variables
-  export DEPLOY_HOST="${DEPLOY_HOST:-localhost}"
-  export DEPLOY_USER="${DEPLOY_USER:-fedora}"
-  export DEPLOY_GROUP="${DEPLOY_GROUP:-fedora}"
-  export DEPLOY_TARGET="${DEPLOY_TARGET:-linux-amd64}"
-  export DEPLOY_PROJECT_NAME="${DEPLOY_PROJECT_NAME:-just-bun-test}"
-  export DEPLOY_SSH_PORT="${DEPLOY_SSH_PORT:-2222}"
-  export DEPLOY_SSH_KEY="${DEPLOY_SSH_KEY:-recipes/e2e/id_ed25519}"
-  # Resolve relative SSH key path to absolute
-  [[ "$DEPLOY_SSH_KEY" != /* ]] && export DEPLOY_SSH_KEY="$PWD/$DEPLOY_SSH_KEY"
-  export DEPLOY_SSH_OPTS="${DEPLOY_SSH_OPTS:--o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null}"
-
-  # Deploy paths (matching app.just defaults)
-  export BIN_DIR="/usr/local/bin"
-  export WWW_DIR="/var/www/$DEPLOY_PROJECT_NAME"
-  export ETC_DIR="/etc"
-
-  # SSH helper variables
-  export SSH_KEY="$DEPLOY_SSH_KEY"
-  export SSH_PORT="$DEPLOY_SSH_PORT"
-  export SSH_HOST="$DEPLOY_HOST"
-  export SSH_USER="$DEPLOY_USER"
-  export SSH_OPTS="$DEPLOY_SSH_OPTS"
-
-  # Get current commit for verification
-  export CURRENT_COMMIT=$(git rev-parse --short HEAD)
-  export PREV_COMMIT=$(git rev-parse --short HEAD~1)
-}
-
-# Run command on remote server via SSH (suppress SSH warnings)
-remote() {
-  ssh $SSH_OPTS -i "$SSH_KEY" -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "$@" 2>/dev/null
-}
+load helpers
 
 # ============================================================================
 # Initial Deploy - Build & Release
@@ -396,4 +359,26 @@ remote() {
 
   # They should match
   [ "$cmd_version" = "$link_version" ]
+}
+
+# ============================================================================
+# Host Discovery
+# ============================================================================
+
+@test "host: apps lists deployed applications" {
+  run just host apps
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "$DEPLOY_PROJECT_NAME" ]]
+}
+
+@test "host: databases lists app database" {
+  run just host databases
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "app.db" ]]
+}
+
+@test "host: services lists running services" {
+  run just host services
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "$DEPLOY_PROJECT_NAME" ]]
 }

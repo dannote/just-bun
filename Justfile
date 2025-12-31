@@ -9,6 +9,10 @@ import "recipes/bun.just"
 
 # Caddy reverse proxy management
 mod caddy "recipes/accessories/caddy.just"
+# Forgejo Git forge management
+mod forgejo "recipes/accessories/forgejo.just"
+# Litestream SQLite replication management
+mod litestream "recipes/accessories/litestream.just"
 # Vector log aggregator management
 mod vector "recipes/accessories/vector.just"
 # MinIO client management
@@ -21,6 +25,8 @@ mod db "recipes/db.just"
 mod shadcn "recipes/shadcn.just"
 # Binary repository management
 mod repo "recipes/repo.just"
+# Host discovery and management
+mod host "recipes/host.just"
 # End-to-end deployment tests
 mod e2e "recipes/e2e/e2e.just"
 

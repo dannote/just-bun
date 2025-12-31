@@ -1,0 +1,10 @@
+${FORGEJO_DOMAIN} {
+  header -Server
+
+  log {
+    output stdout
+    format json
+  }
+
+  reverse_proxy localhost:${FORGEJO_HTTP_PORT}
+}

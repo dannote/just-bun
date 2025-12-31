@@ -1,0 +1,29 @@
+[Unit]
+Description=Forgejo (Beyond coding. We forge.)
+After=network.target
+
+[Service]
+Type=simple
+User=git
+Group=git
+WorkingDirectory=${DEPLOY_LIB}/forgejo
+
+Environment=USER=git
+Environment=HOME=${DEPLOY_LIB}/forgejo
+Environment=FORGEJO_WORK_DIR=${DEPLOY_LIB}/forgejo
+ExecStart=${DEPLOY_BIN}/forgejo web --config ${DEPLOY_ETC}/forgejo/app.ini
+Restart=on-failure
+RestartSec=2s
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=${DEPLOY_LIB}/forgejo
+ReadWritePaths=${DEPLOY_ETC}/forgejo
+
+[Install]
+WantedBy=multi-user.target

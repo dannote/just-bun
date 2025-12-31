@@ -10,12 +10,18 @@ sources:
     http:
       address: "127.0.0.1:4318"
 
-  # Journald logs from systemd services
+  # Journald logs from all systemd services
+  # Captures all apps automatically without config changes
   journald:
     type: journald
-    include_units:
-      - caddy
-      - ${DEPLOY_PROJECT_NAME}
+    exclude_units:
+      - systemd-*
+      - sshd
+      - dbus
+      - NetworkManager
+      - firewalld
+      - chronyd
+      - auditd
 
 transforms:
   # Parse and enrich logs

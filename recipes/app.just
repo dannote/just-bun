@@ -147,6 +147,10 @@ status: _ssh-open
 logs *args: _ssh-open
   {{ssh-run}} journalctl -u {{DEPLOY_PROJECT_NAME}} {{args}}
 
+# Open the app console (requires ENABLE_CONSOLE=1)
+console: _ssh-open
+  {{ssh-run}} 'cd {{lib_dir}} && ENABLE_CONSOLE=1 {{deploy_bin}}/{{DEPLOY_PROJECT_NAME}} console'
+
 # Full deployment: build, upload, configure, and restart
 # Use --force/-f to overwrite existing binary (stops service temporarily)
 deploy *args: caddy::require vector::require mc::require release-production (upload args) setup-systemd restart status caddy::restart vector::restart

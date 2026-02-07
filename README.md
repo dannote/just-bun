@@ -90,6 +90,7 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just app start|stop|restart|status` — manage the app service.
 - `just app enable|disable` — enable or disable the app service without removing files.
 - `just app logs <journalctl args>` — stream service logs like `just app logs -f`.
+- `just app console` — open an interactive console on the server (requires `ENABLE_CONSOLE=1`).
 - `just app version` — show currently deployed version hash.
 - `just app versions` — list all available versions on server.
 - `just app rollback [hash]` — rollback to previous version or a specific hash.

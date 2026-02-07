@@ -6,6 +6,7 @@ import { getLogger } from '@logtape/logtape'
 
 import { name } from './package.json'
 
+import { runConsole } from './lib/console'
 import { setupLogs } from './lib/log'
 import { setupTracing } from './lib/tracing'
 import { migrate } from './lib/db/migrate'
@@ -41,6 +42,16 @@ const app = new Elysia()
     body: type({ name: 'string', age: 'number' })
   })
   .onRequest((ctx) => logger.info`${ctx.request.method} ${ctx.request.url}`)
+
+if (process.argv[2] === 'console') {
+  try {
+    await runConsole(app)
+    process.exit(0)
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
+}
 
 export default app
 

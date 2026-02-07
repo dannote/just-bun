@@ -20,14 +20,14 @@ load helpers
 }
 
 @test "deploy: release creates binary with commit hash" {
-  run just app release linux-amd64
+  run just app release "$DEPLOY_TARGET"
   [ "$status" -eq 0 ]
 
   # Verify binary exists with correct name
-  [ -f "repo/linux/amd64/$DEPLOY_PROJECT_NAME.$CURRENT_COMMIT" ]
+  [ -f "repo/${DEPLOY_TARGET/-//}/$DEPLOY_PROJECT_NAME.$CURRENT_COMMIT" ]
 
   # Verify binary is executable
-  [ -x "repo/linux/amd64/$DEPLOY_PROJECT_NAME.$CURRENT_COMMIT" ]
+  [ -x "repo/${DEPLOY_TARGET/-//}/$DEPLOY_PROJECT_NAME.$CURRENT_COMMIT" ]
 }
 
 # ============================================================================
@@ -149,6 +149,17 @@ load helpers
 
   # Logs should not be empty
   [ -n "$output" ]
+}
+
+@test "verify: console evaluates input" {
+  cmd='printf "1 + 1\nroutes\n" | just app console'
+
+  run bash -lc "$cmd"
+  [ "$status" -eq 0 ]
+
+  [[ "$output" =~ "2" ]]
+  [[ "$output" =~ "/api/hello" ]]
+  [[ "$output" =~ "GET" ]]
 }
 
 # ============================================================================

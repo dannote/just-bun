@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Host discovery commands: `just host apps`, `databases`, `services`
 - E2E tests for Forgejo deployment and service lifecycle
 - E2E tests for Litestream replication with MinIO S3 container
+- Rails-style app console over SSH via `just app console` (requires `ENABLE_CONSOLE=1`)
+- E2E coverage for the app console command
 - Kysely database layer with type-safe queries and bundled migrations
 - Database repository pattern in `lib/db/repo/` for query encapsulation
 - App service management commands: `enable`, `disable`, `uninstall`, `version`, `versions`, `rollback`, `prune`

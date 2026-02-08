@@ -1,0 +1,15 @@
+storage:
+  type: sqlite
+  path: ${DEPLOY_LIB}/gatus/data.db
+
+alerting:
+  telegram:
+    token: ${GATUS_TELEGRAM_BOT_TOKEN}
+    id: ${GATUS_TELEGRAM_CHAT_ID}
+    default-alert:
+      enabled: true
+      failure-threshold: 3
+      success-threshold: 2
+      send-on-resolved: true
+
+endpoints: []

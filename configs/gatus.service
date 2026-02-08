@@ -1,0 +1,14 @@
+[Unit]
+Description=Gatus health monitoring
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=${DEPLOY_BIN}/gatus
+Environment=GATUS_CONFIG_PATH=${DEPLOY_ETC}/gatus/gatus.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

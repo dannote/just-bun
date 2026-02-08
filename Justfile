@@ -15,6 +15,8 @@ mod forgejo "recipes/accessories/forgejo.just"
 mod litestream "recipes/accessories/litestream.just"
 # Vector log aggregator management
 mod vector "recipes/accessories/vector.just"
+# Gatus health monitoring
+mod gatus "recipes/accessories/gatus.just"
 # MinIO client management
 mod mc "recipes/accessories/mc.just"
 # Application deployment and management

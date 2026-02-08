@@ -17,7 +17,7 @@ export SHA512 := if `command -v sha512sum || true` != "" { "sha512sum" } else { 
 repo_path := repo_dir + "/" + REPO_OS + "/" + REPO_ARCH
 
 # Available apps (add new apps here and create recipes/repo/{name}.just)
-apps := "caddy forgejo litestream mc vector"
+apps := "caddy forgejo litestream mc typst vector"
 
 alias list := info
 
@@ -90,4 +90,5 @@ mod caddy "./repo/caddy.just"
 mod forgejo "./repo/forgejo.just"
 mod litestream "./repo/litestream.just"
 mod mc "./repo/mc.just"
+mod typst "./repo/typst.just"
 mod vector "./repo/vector.just"

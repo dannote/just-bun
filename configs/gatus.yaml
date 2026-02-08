@@ -4,8 +4,8 @@ storage:
 
 alerting:
   telegram:
-    token: ${GATUS_TELEGRAM_BOT_TOKEN}
-    id: ${GATUS_TELEGRAM_CHAT_ID}
+    token: ${MONITORING_TELEGRAM_BOT_TOKEN}
+    id: ${MONITORING_TELEGRAM_CHAT_ID}
     default-alert:
       enabled: true
       failure-threshold: 3

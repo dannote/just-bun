@@ -23,6 +23,7 @@ node_modules
 !configs/generated/.keep
 
 /tmp
+/.worktrees
 
 # E2E test SSH keys
 recipes/e2e/id_ed25519

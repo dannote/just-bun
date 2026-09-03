@@ -10,16 +10,10 @@ load helpers
 # ============================================================================
 
 @test "forgejo: binary exists in repo" {
-  # Detect architecture (arm64 on Apple Silicon)
-  arch=$(uname -m)
-  case "$arch" in
-    arm64|aarch64) repo_arch="arm64" ;;
-    x86_64|amd64) repo_arch="amd64" ;;
-    *) skip "Unsupported architecture: $arch" ;;
-  esac
+  target_path=${DEPLOY_TARGET/-//}
 
   # Check if binary exists
-  run ls repo/linux/$repo_arch/forgejo.*
+  run ls repo/$target_path/forgejo.*
   if [ "$status" -ne 0 ]; then
     # Try to collect it
     run just repo forgejo collect
@@ -27,7 +21,7 @@ load helpers
   fi
 
   # Verify binary exists
-  run ls repo/linux/$repo_arch/forgejo.*
+  run ls repo/$target_path/forgejo.*
   [ "$status" -eq 0 ]
 }
 

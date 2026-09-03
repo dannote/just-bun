@@ -24,7 +24,7 @@ I was tired of slow Docker builds and container registries for every small chang
 - Minimal DevOps: build a single executable, [rsync](https://rsync.samba.org), and let [systemd](https://systemd.io) + [Caddy](https://caddyserver.com) keep it running—no images or registries required.
 
 ## Getting started
-The shortest path is: install `just`, run `just bun`, and start the dev server. You can scaffold with Bun or clone the repo.
+The shortest path is: install `just` 1.58 or newer, run `just bun`, and start the dev server. You can scaffold with Bun or clone the repo.
 
 **Using `bun create`**
 
@@ -76,14 +76,14 @@ Prefer packages? Grab `just` via:
 - Fedora: `sudo dnf install just`
 - Other distros: see the package list at [just.systems/man/en/packages](https://just.systems/man/en/packages.html).
 
-After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. Verify `just --version`, then explore available tasks with `just --list`. Read the full docs at [just.systems/man](https://just.systems/man/en/) if you want to extend the taskfile.
+After installing `just` 1.58 or newer, run `just bun` to fetch Bun if it is not on your PATH. Verify `just --version`, then explore available tasks by running bare `just` or `just --list`. Commands are grouped by purpose, and `just --usage app deploy` shows generated help for recipe arguments and flags. Read the full docs at [just.systems/man](https://just.systems/man/en/) if you want to extend the taskfile.
 
 ## Commands
 - `just bun` — install Bun if it is not already available.
 - `just dev` — run the full stack locally.
 - `just build` — [Vite](https://vite.dev) build + [Nitro](https://nitro.unjs.io) output.
 - `just test` — bun:test example suite.
-- `just format` / `just lint` — [Biome](https://biomejs.dev) + [oxlint](https://oxc-project.github.io/oxlint/) for consistency.
+- `just format` / `just lint` — run the TypeScript formatters/linters and enforce canonical formatting for every Just module.
 - `just app release` — compile the server to a static Bun binary in `releases/`.
 - `just ssh` — open an interactive shell on the deploy target.
 - `just repo collect|status|verify` — manage the local binary repository. See [The repository](#the-repository).
@@ -95,7 +95,7 @@ After installing `just`, run `just bun` to fetch Bun if it is not on your PATH. 
 - `just app versions` — list all available versions on server.
 - `just app rollback [hash]` — rollback to previous version or a specific hash.
 - `just app prune` — remove old binary versions, keeping latest 3.
-- `just app uninstall` — remove service, configs, binaries, and all app data.
+- `just app uninstall` — remove service, configs, binaries, and all app data after an interactive confirmation (use Just's `--yes` flag in automation).
 - `just db migrate|status|new|rollback` — manage database migrations with [Kysely](https://kysely.dev).
 - `just host apps` — list all apps deployed on the server.
 - `just host databases` — list all SQLite databases on the server.

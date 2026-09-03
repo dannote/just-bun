@@ -18,67 +18,67 @@ binary_url := base_url + "/" + binary_name
 checksum_url := binary_url + ".sha256"
 
 info:
-  @echo 'forgejo {{version}} - {{desc}}'
+    @echo 'forgejo {{ version }} - {{ desc }}'
 
 verify:
-  @just repo _verify-bin forgejo {{version}}
+    @just repo _verify-bin forgejo {{ version }}
 
 collect: _download _verify-vendor
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  mv {{staging_path}}/forgejo {{binary_path}}
-  chmod +x {{binary_path}}
+    mv {{ staging_path }}/forgejo {{ binary_path }}
+    chmod +x {{ binary_path }}
 
-  # Store vendor checksum for future verification
-  awk '{print $1}' {{staging_path}}/forgejo.sha256 > {{binary_path}}.sig
+    # Store vendor checksum for future verification
+    awk '{print $1}' {{ staging_path }}/forgejo.sha256 > {{ binary_path }}.sig
 
-  rm -rf {{staging_path}}
-  echo '{{SUCCESS}}Collected forgejo.{{version}}{{RESET}}'
+    rm -rf {{ staging_path }}
+    echo '{{ SUCCESS }}Collected forgejo.{{ version }}{{ RESET }}'
 
 _download:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    echo '{{MUTED}}forgejo.{{version}} exists, skipping{{RESET}}'
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      echo '{{ MUTED }}forgejo.{{ version }} exists, skipping{{ RESET }}'
+      exit 0
+    fi
 
-  if [ "{{os}}" != "linux" ]; then
-    echo '{{MUTED}}forgejo only available for linux, skipping{{RESET}}'
-    exit 0
-  fi
+    if [ "{{ os }}" != "linux" ]; then
+      echo '{{ MUTED }}forgejo only available for linux, skipping{{ RESET }}'
+      exit 0
+    fi
 
-  echo '{{ACCENT}}Downloading forgejo {{version}} ({{platform}})...{{RESET}}'
+    echo '{{ ACCENT }}Downloading forgejo {{ version }} ({{ platform }})...{{ RESET }}'
 
-  mkdir -p {{staging_path}}
-  curl -fsSL {{binary_url}} -o {{staging_path}}/forgejo
-  curl -fsSL {{checksum_url}} -o {{staging_path}}/forgejo.sha256
+    mkdir -p {{ staging_path }}
+    curl -fsSL {{ binary_url }} -o {{ staging_path }}/forgejo
+    curl -fsSL {{ checksum_url }} -o {{ staging_path }}/forgejo.sha256
 
 _verify-vendor:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  if [ "{{os}}" != "linux" ]; then
-    exit 0
-  fi
+    if [ "{{ os }}" != "linux" ]; then
+      exit 0
+    fi
 
-  expected=$(awk '{print $1}' {{staging_path}}/forgejo.sha256)
-  actual=$($SHA256 {{staging_path}}/forgejo | awk '{print $1}')
+    expected=$(awk '{print $1}' {{ staging_path }}/forgejo.sha256)
+    actual=$($SHA256 {{ staging_path }}/forgejo | awk '{print $1}')
 
-  if [ "$expected" != "$actual" ]; then
-    echo '{{ERROR}}Checksum mismatch!{{RESET}}'
-    rm -rf {{staging_path}}
-    exit 1
-  fi
+    if [ "$expected" != "$actual" ]; then
+      echo '{{ ERROR }}Checksum mismatch!{{ RESET }}'
+      rm -rf {{ staging_path }}
+      exit 1
+    fi
 
-  echo '{{SUCCESS}}Verified against vendor checksum (SHA256){{RESET}}'
+    echo '{{ SUCCESS }}Verified against vendor checksum (SHA256){{ RESET }}'

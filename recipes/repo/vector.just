@@ -19,51 +19,51 @@ base_url := "https://github.com/vectordotdev/vector/releases/download/v" + versi
 archive_url := base_url + "/vector-" + version + "-" + platform + ".tar.gz"
 
 info:
-  @echo 'vector {{version}} - {{desc}}'
+    @echo 'vector {{ version }} - {{ desc }}'
 
 verify:
-  @just repo _verify-bin vector {{version}}
+    @just repo _verify-bin vector {{ version }}
 
 # Vector doesn't provide vendor checksums, so we compute our own
 collect: _download _compute-checksum
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  mv {{staging_path}}/vector-{{platform}}/bin/vector {{binary_path}}
-  chmod +x {{binary_path}}
+    mv {{ staging_path }}/vector-{{ platform }}/bin/vector {{ binary_path }}
+    chmod +x {{ binary_path }}
 
-  # Store computed checksum
-  cat {{staging_path}}/checksum > {{binary_path}}.sig
+    # Store computed checksum
+    cat {{ staging_path }}/checksum > {{ binary_path }}.sig
 
-  rm -rf {{staging_path}}
-  echo '{{SUCCESS}}Collected vector.{{version}}{{RESET}}'
+    rm -rf {{ staging_path }}
+    echo '{{ SUCCESS }}Collected vector.{{ version }}{{ RESET }}'
 
 _download:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    echo '{{MUTED}}vector.{{version}} exists, skipping{{RESET}}'
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      echo '{{ MUTED }}vector.{{ version }} exists, skipping{{ RESET }}'
+      exit 0
+    fi
 
-  echo '{{ACCENT}}Downloading vector {{version}} ({{platform}})...{{RESET}}'
+    echo '{{ ACCENT }}Downloading vector {{ version }} ({{ platform }})...{{ RESET }}'
 
-  mkdir -p {{staging_path}}
-  curl -fsSL {{archive_url}} -o {{staging_path}}/archive.tar.gz
-  tar -xzf {{staging_path}}/archive.tar.gz -C {{staging_path}}
+    mkdir -p {{ staging_path }}
+    curl -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _compute-checksum:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  $SHA256 {{staging_path}}/archive.tar.gz | awk '{print $1}' > {{staging_path}}/checksum
-  echo '{{MUTED}}Computed checksum (SHA256) - no vendor signature available{{RESET}}'
+    $SHA256 {{ staging_path }}/archive.tar.gz | awk '{print $1}' > {{ staging_path }}/checksum
+    echo '{{ MUTED }}Computed checksum (SHA256) - no vendor signature available{{ RESET }}'

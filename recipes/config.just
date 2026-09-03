@@ -7,6 +7,8 @@ root := justfile_directory()
 configs_dir := root + "/configs"
 generated_dir := configs_dir + "/generated"
 
+export DEPLOY_TARGET := env("DEPLOY_TARGET", "linux-amd64")
+
 export DEPLOY_PROJECT_NAME := env("DEPLOY_PROJECT_NAME", "just-bun")
 export DEPLOY_DOMAIN := env("DEPLOY_DOMAIN", env("DEPLOY_HOST", "localhost"))
 export DEPLOY_BIN := deploy_bin
@@ -34,5 +36,5 @@ export LITESTREAM_SYNC_INTERVAL := env("LITESTREAM_SYNC_INTERVAL", "1s")
 
 # Generate a config file by interpolating environment variables
 _generate-config name:
-  @mkdir -p {{generated_dir}}
-  @envsubst < {{configs_dir}}/{{name}} >| {{generated_dir}}/{{name}}
+    @mkdir -p {{ generated_dir }}
+    @envsubst < {{ configs_dir }}/{{ name }} >| {{ generated_dir }}/{{ name }}

@@ -2,42 +2,42 @@ import "../ssh.just"
 import "../colors.just"
 
 root := justfile_directory()
-
 version := env('MC_VERSION', '2025-08-13T08-35-41Z')
-repo_path := root + "/repo/linux/amd64"
+repo_path := root + "/repo/" + replace(env("DEPLOY_TARGET", "linux-amd64"), "-", "/")
 
 export DEPLOY_BIN := deploy_bin
 
 # Ensure mc is installed
 require: _ssh-open
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if {{ssh-run}} test -x {{deploy_bin}}/mc; then
-    echo '{{SUCCESS}}mc installed at {{deploy_bin}}/mc{{RESET}}'
-    exit 0
-  fi
+    if {{ ssh-run }} test -x {{ deploy_bin }}/mc; then
+      echo '{{ SUCCESS }}mc installed at {{ deploy_bin }}/mc{{ RESET }}'
+      exit 0
+    fi
 
-  echo '{{WARNING}}mc not found, installing...{{RESET}}'
-  just mc deploy
+    echo '{{ WARNING }}mc not found, installing...{{ RESET }}'
+    just mc deploy
 
 # Deploy mc to server
 deploy: _ssh-open
-  {{rsync}} {{repo_path}}/mc.{{version}} {{ssh_user_host}}:/tmp/mc.{{version}}
+    {{ rsync }} {{ repo_path }}/mc.{{ version }} {{ ssh_user_host }}:/tmp/mc.{{ version }}
 
-  {{ssh-run}} sudo mv /tmp/mc.{{version}} {{deploy_bin}}/mc.{{version}}
-  {{ssh-run}} sudo chmod +x {{deploy_bin}}/mc.{{version}}
-  {{ssh-run}} sudo ln -sfn {{deploy_bin}}/mc.{{version}} {{deploy_bin}}/mc
+    {{ ssh-run }} sudo mv /tmp/mc.{{ version }} {{ deploy_bin }}/mc.{{ version }}
+    {{ ssh-run }} sudo chmod +x {{ deploy_bin }}/mc.{{ version }}
+    {{ ssh-run }} sudo ln -sfn {{ deploy_bin }}/mc.{{ version }} {{ deploy_bin }}/mc
 
-  echo '{{SUCCESS}}mc deployed{{RESET}}'
+    echo '{{ SUCCESS }}mc deployed{{ RESET }}'
 
 # Remove mc from server
+[confirm('Uninstall mc and remove all of its data?')]
 uninstall: _ssh-open
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  echo '{{WARNING}}Uninstalling mc...{{RESET}}'
+    echo '{{ WARNING }}Uninstalling mc...{{ RESET }}'
 
-  {{ssh-run}} sudo rm -f {{deploy_bin}}/mc {{deploy_bin}}/mc.*
+    {{ ssh-run }} sudo rm -f {{ deploy_bin }}/mc {{ deploy_bin }}/mc.*
 
-  echo '{{SUCCESS}}mc uninstalled{{RESET}}'
+    echo '{{ SUCCESS }}mc uninstalled{{ RESET }}'

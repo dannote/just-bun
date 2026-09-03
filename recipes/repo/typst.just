@@ -19,48 +19,48 @@ base_url := "https://github.com/typst/typst/releases/download/v" + version
 archive_url := base_url + "/typst-" + platform + ".tar.xz"
 
 info:
-  @echo 'typst {{version}} - {{desc}}'
+    @echo 'typst {{ version }} - {{ desc }}'
 
 verify:
-  @just repo _verify-bin typst {{version}}
+    @just repo _verify-bin typst {{ version }}
 
 collect: _download _compute-checksum
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  mv {{staging_path}}/typst-{{platform}}/typst {{binary_path}}
-  chmod +x {{binary_path}}
+    mv {{ staging_path }}/typst-{{ platform }}/typst {{ binary_path }}
+    chmod +x {{ binary_path }}
 
-  cat {{staging_path}}/checksum > {{binary_path}}.sig
+    cat {{ staging_path }}/checksum > {{ binary_path }}.sig
 
-  rm -rf {{staging_path}}
-  echo '{{SUCCESS}}Collected typst.{{version}}{{RESET}}'
+    rm -rf {{ staging_path }}
+    echo '{{ SUCCESS }}Collected typst.{{ version }}{{ RESET }}'
 
 _download:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    echo '{{MUTED}}typst.{{version}} exists, skipping{{RESET}}'
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      echo '{{ MUTED }}typst.{{ version }} exists, skipping{{ RESET }}'
+      exit 0
+    fi
 
-  echo '{{ACCENT}}Downloading typst {{version}} ({{platform}})...{{RESET}}'
+    echo '{{ ACCENT }}Downloading typst {{ version }} ({{ platform }})...{{ RESET }}'
 
-  mkdir -p {{staging_path}}
-  curl -fsSL {{archive_url}} -o {{staging_path}}/archive.tar.xz
-  tar -xJf {{staging_path}}/archive.tar.xz -C {{staging_path}}
+    mkdir -p {{ staging_path }}
+    curl -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.xz
+    tar -xJf {{ staging_path }}/archive.tar.xz -C {{ staging_path }}
 
 _compute-checksum:
-  #!/usr/bin/env bash
-  set -euo pipefail
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-  if [ -f "{{binary_path}}" ]; then
-    exit 0
-  fi
+    if [ -f "{{ binary_path }}" ]; then
+      exit 0
+    fi
 
-  $SHA256 {{staging_path}}/archive.tar.xz | awk '{print $1}' > {{staging_path}}/checksum
+    $SHA256 {{ staging_path }}/archive.tar.xz | awk '{print $1}' > {{ staging_path }}/checksum

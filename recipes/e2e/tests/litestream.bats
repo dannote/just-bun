@@ -39,16 +39,10 @@ teardown_file() {
 # ============================================================================
 
 @test "litestream: binary exists in repo" {
-  # Detect architecture
-  arch=$(uname -m)
-  case "$arch" in
-    arm64|aarch64) repo_arch="arm64" ;;
-    x86_64|amd64) repo_arch="amd64" ;;
-    *) skip "Unsupported architecture: $arch" ;;
-  esac
+  target_path=${DEPLOY_TARGET/-//}
 
   # Check if binary exists
-  run ls repo/linux/$repo_arch/litestream.*
+  run ls repo/$target_path/litestream.*
   if [ "$status" -ne 0 ]; then
     # Try to collect it
     run just repo litestream collect
@@ -56,7 +50,7 @@ teardown_file() {
   fi
 
   # Verify binary exists
-  run ls repo/linux/$repo_arch/litestream.*
+  run ls repo/$target_path/litestream.*
   [ "$status" -eq 0 ]
 }
 

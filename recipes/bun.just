@@ -2,12 +2,12 @@ import "./colors.just"
 
 # Install Bun if not available
 bun:
-  #!/usr/bin/env bash
+    #!/usr/bin/env bash
 
-  if command -v bun >/dev/null; then
-    echo '{{SUCCESS}}Bun is already installed.{{RESET}}'
-  else
-    echo '{{ACCENT}}Installing Bun{{RESET}}'
+    if command -v bun >/dev/null; then
+      echo '{{ SUCCESS }}Bun is already installed.{{ RESET }}'
+    else
+      echo '{{ ACCENT }}Installing Bun{{ RESET }}'
 
-    curl -fsSL https://bun.sh/install | bash
-  fi
+      curl -fsSL https://bun.sh/install | bash
+    fi

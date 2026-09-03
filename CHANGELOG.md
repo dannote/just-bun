@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Modern Just command metadata with grouped recipe listings, generated argument help, typed flags, and argument validation
+- Minimum Just version enforcement and a command listing when `just` is run without a recipe
+- Confirmation prompts for destructive database and uninstall commands
+- Native Just lists, parallel dependency mapping, and cached Gatus builds for binary repository work
 - Litestream SQLite replication to S3-compatible storage with automatic database discovery
 - Forgejo self-hosted Git forge with `add-remote` command for easy repo setup
 - Host discovery commands: `just host apps`, `databases`, `services`
@@ -27,4 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Vite plugin to patch `@opentelemetry/resources` dynamic imports for Bun compatibility
 
 ### Changed
+- Standardized all Just modules with `just --fmt` and added formatting checks to `just format` and `just lint`
+- Accessory deployment paths now follow `DEPLOY_TARGET` instead of assuming `linux-amd64`
+- `just app upload` and `just app deploy` now expose first-class `--force`/`-f` flags
 - Restructured deployment recipes into `accessories/` and `repo/` modules

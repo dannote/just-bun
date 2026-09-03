@@ -20,12 +20,12 @@ deploy_lib := env('DEPLOY_LIB_PATH', '/var/lib')
 deploy_cache := env('DEPLOY_CACHE_PATH', '/var/cache')
 
 _ssh-open:
-  #!/usr/bin/env bash
+    #!/usr/bin/env bash
 
-  set -euo pipefail
+    set -euo pipefail
 
-  if ssh -o ControlPath={{ssh_control_path}} -O check {{ssh_user_host}} 2>/dev/null; then
-    exit 0
-  fi
+    if ssh -o ControlPath={{ ssh_control_path }} -O check {{ ssh_user_host }} 2>/dev/null; then
+      exit 0
+    fi
 
-  ssh -N -f -o ControlMaster=yes {{ssh_base_opts}} {{ssh_user_host}}
+    ssh -N -f -o ControlMaster=yes {{ ssh_base_opts }} {{ ssh_user_host }}

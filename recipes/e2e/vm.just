@@ -48,8 +48,7 @@ start:
       --cgroupns=host \
       -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
       -p {{ ssh_port }}:22 \
-      {{ image_name }} \
-      /usr/lib/systemd/systemd
+      {{ image_name }}
 
     echo "{{ SUCCESS }}Container started{{ RESET }}"
 

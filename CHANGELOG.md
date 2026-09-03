@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Bun 1.4-powered parallel test mode, Markdown CPU/heap profiling recipes, dependency audit, and lockfile deduplication checks
+- Regression tests for Just flags, argument validation, confirmations, and deployment-target paths
 - Modern Just command metadata with grouped recipe listings, generated argument help, typed flags, and argument validation
 - Minimum Just version enforcement and a command listing when `just` is run without a recipe
 - Confirmation prompts for destructive database and uninstall commands

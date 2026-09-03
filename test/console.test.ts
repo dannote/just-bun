@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { spawn } from 'node:child_process'
 
-const stripAnsi = (value: string) =>
-  value.replace(/\x1b\[[0-9;]*m/g, '')
+const stripAnsi = (value: string) => Bun.stripANSI(value)
 
 const runConsole = () =>
   new Promise<string>((resolve, reject) => {

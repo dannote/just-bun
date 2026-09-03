@@ -20,6 +20,15 @@ cache_dir := deploy_cache + "/" + DEPLOY_PROJECT_NAME
 
 hash := `git rev-parse --short HEAD`
 
+# Check dependencies for known vulnerabilities
+[arg('args', help='Arguments forwarded to bun audit')]
+audit *args:
+    bun audit {{ args }}
+
+# Check whether the lockfile can be deduplicated
+check-dedupe:
+    bun dedupe --check
+
 # Install project dependencies
 install:
     bun install

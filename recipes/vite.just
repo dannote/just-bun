@@ -15,10 +15,10 @@ preview *args:
 # Format code with Biome
 format *args:
     {{ bun }} run format {{ args }}
-    just justfile-format
+    just _justfile-format
 
 # Check all Just modules are canonically formatted
-justfile-format-check:
+_justfile-format-check:
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -27,7 +27,7 @@ justfile-format-check:
     done < <(find Justfile recipes -type f \( -name 'Justfile' -o -name '*.just' \) | sort)
 
 # Format all Just modules
-justfile-format:
+_justfile-format:
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -38,7 +38,7 @@ justfile-format:
 # Lint code with Biome and oxlint
 lint *args:
     {{ bun }} run lint {{ args }}
-    just justfile-format-check
+    just _justfile-format-check
 
 # Run tests
 [arg('parallel', long, short='p', value='true', help='Run test files in parallel')]

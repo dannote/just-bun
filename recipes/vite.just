@@ -44,31 +44,3 @@ lint *args:
 [arg('parallel', long, short='p', value='true', help='Run test files in parallel')]
 test parallel='false' *args:
     {{ bun }} run test {{ if parallel == 'true' { '--parallel' } else { '' } }} {{ args }}
-
-# Run a production CPU profile and write a Markdown report
-[arg('seconds', pattern='[1-9][0-9]*', help='Profile duration in seconds')]
-profile-cpu seconds='30': build
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    mkdir -p profiles
-    timeout={{ seconds }}
-    bun --cpu-prof-md --cpu-prof-dir profiles .output/server/index.mjs &
-    pid=$!
-    sleep "$timeout"
-    kill -INT "$pid"
-    wait "$pid" || true
-
-# Run a production heap profile and write a Markdown report
-[arg('seconds', pattern='[1-9][0-9]*', help='Profile duration in seconds')]
-profile-heap seconds='30': build
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    mkdir -p profiles
-    timeout={{ seconds }}
-    bun --heap-prof-md --heap-prof-dir profiles .output/server/index.mjs &
-    pid=$!
-    sleep "$timeout"
-    kill -INT "$pid"
-    wait "$pid" || true

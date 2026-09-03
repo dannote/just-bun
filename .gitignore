@@ -24,7 +24,6 @@ node_modules
 
 /tmp
 /.worktrees
-/profiles
 
 # E2E test SSH keys
 recipes/e2e/id_ed25519

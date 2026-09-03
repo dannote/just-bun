@@ -86,7 +86,6 @@ After installing `just` 1.58 or newer, run `just bun` to fetch Bun if it is not 
 - `just format` / `just lint` — run the TypeScript formatters/linters and enforce canonical formatting for every Just module.
 - `just app audit [args]` — check dependencies with `bun audit`.
 - `just app check-dedupe` — fail if Bun can remove duplicate lockfile versions.
-- `just profile-cpu [seconds]` / `just profile-heap [seconds]` — profile the production build and write Markdown reports to `profiles/`.
 - `just app release` — compile the server to a static Bun binary in `releases/`.
 - `just ssh` — open an interactive shell on the deploy target.
 - `just repo collect|status|verify` — manage the local binary repository. See [The repository](#the-repository).

@@ -64,3 +64,4 @@ sinks:
     path: "${DEPLOY_LIB}/vector/logs/%Y-%m-%d.json"
     encoding:
       codec: json
+    condition: '${VECTOR_LOG_SINK} == "file"'

@@ -1,7 +1,7 @@
 FROM docker.io/antmelekhin/docker-systemd:fedora-43@sha256:4d6f339a3e62a6d94a6da312bb6cbaf6317f0dd6e39ea7f115c5ccf33ef777e3
 
 # Install dependencies
-RUN dnf install -y --setopt=install_weak_deps=False openssh-server rsync \
+RUN dnf install -y --setopt=install_weak_deps=False openssh-server rsync git-core \
     && dnf clean all
 
 # Create deploy user with sudo access

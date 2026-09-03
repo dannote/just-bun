@@ -8,6 +8,7 @@ load helpers
 setup_file() {
   _setup_env
   just e2e vm start-s3
+  remote "sudo mkdir -p $LIB_DIR/$DEPLOY_PROJECT_NAME && sudo touch $LIB_DIR/$DEPLOY_PROJECT_NAME/app.db"
 }
 
 teardown_file() {

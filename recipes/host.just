@@ -28,7 +28,7 @@ _database-paths: _ssh-open
     {{ ssh-run }} "find {{ lib_dir }} -maxdepth 2 -name 'app.db' -type f 2>/dev/null" || true
 
     # Forgejo database
-    if {{ ssh-run }} "test -f {{ lib_dir }}/forgejo/data/forgejo.db" 2>/dev/null; then
+    if {{ ssh-run }} "sudo test -f {{ lib_dir }}/forgejo/data/forgejo.db" 2>/dev/null; then
       echo "{{ lib_dir }}/forgejo/data/forgejo.db"
     fi
 

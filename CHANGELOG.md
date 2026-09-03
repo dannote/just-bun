@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Vite plugin to patch `@opentelemetry/resources` dynamic imports for Bun compatibility
 
 ### Changed
+- Added a configurable Vector file-log sink to prevent recursive journald output in e2e tests
 - Replaced the amd64-only e2e systemd image with a digest-pinned Fedora 43 image supporting amd64 and arm64
 - Standardized all Just modules with `just --fmt` and added formatting checks to `just format` and `just lint`
 - Accessory deployment paths now follow `DEPLOY_TARGET` instead of assuming `linux-amd64`

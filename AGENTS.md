@@ -15,7 +15,7 @@ We use `just` as our command runner to keep things simple and consistent. Here a
 
 We value clean, consistent, and readable code. Here are the main principles we follow:
 
-**Formatting:** We use Biome to automatically format our code. Just run `just format` and `just lint` before committing. The key rules are 2-space indentation, a line width of 80 characters, and single quotes for all TypeScript and JavaScript files.
+**Formatting:** We use Oxfmt to automatically format our code and Oxlint with type-aware checks for linting. Just run `just format` and `just lint` before committing. The key rules are 2-space indentation, a line width of 80 characters, and single quotes for all TypeScript and JavaScript files.
 
 **Language & Types:** This is a TypeScript-first project. Please use types for all new code to maintain safety and clarity.
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Type-aware Oxlint policy checks and Oxfmt formatting configured for concise, actionable agent feedback
 - Bun 1.4-powered parallel test mode, dependency audit, and lockfile deduplication checks
 - Regression tests for Just flags, argument validation, confirmations, and deployment-target paths
 - Modern Just command metadata with grouped recipe listings, generated argument help, typed flags, and argument validation
@@ -30,9 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - MinIO client (`mc`) for S3-compatible storage operations
 - Envsubst-based config templating in `configs/`
 - Delta transfers via rsync with stable cache paths
-- Vite plugin to patch `@opentelemetry/resources` dynamic imports for Bun compatibility
 
 ### Changed
+- Replaced Biome with Oxfmt and upgraded the Oxlint TypeScript linting stack
+- Upgraded compatible Elysia, Vue, Tailwind, ArkType, Reka UI, and build-tool dependencies
 - Added a configurable Vector file-log sink to prevent recursive journald output in e2e tests
 - Replaced the amd64-only e2e systemd image with a digest-pinned Fedora 43 image supporting amd64 and arm64
 - Standardized all Just modules with `just --fmt` and added formatting checks to `just format` and `just lint`

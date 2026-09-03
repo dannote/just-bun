@@ -45,7 +45,9 @@ const loadFilesystemMigrations = async () => {
     const migrations = new Map<string, Migration>()
 
     for await (const path of glob.scan({ cwd: migrationsDir })) {
-      const module = (await import(new URL(path, migrationsDirUrl).href)) as Migration
+      const module = (await import(
+        new URL(path, migrationsDirUrl).href
+      )) as Migration
       migrations.set(path.replace('.ts', ''), module)
     }
 

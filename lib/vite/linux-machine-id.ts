@@ -11,7 +11,7 @@ export function linuxMachineId(): Plugin {
         !id.includes('@opentelemetry/resources') ||
         !id.endsWith('getMachineId.js')
       )
-        return
+        return null
 
       return dedent`
         import { promises as fs } from 'fs';

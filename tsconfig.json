@@ -13,5 +13,6 @@
       "unplugin-vue-router/client",
       "vite/client"
     ]
-  }
+  },
+  "include": ["**/*.ts", "**/*.vue", "auto-imports.d.ts", "typed-router.d.ts"]
 }

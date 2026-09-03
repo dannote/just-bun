@@ -51,15 +51,11 @@ const runConsole = () =>
   })
 
 describe('app console', () => {
-  it(
-    'evaluates input and prints routes',
-    async () => {
-      const output = await runConsole()
+  it('evaluates input and prints routes', async () => {
+    const output = await runConsole()
 
-      expect(output).toContain('2')
-      expect(output).toContain('/api/hello')
-      expect(output).toContain('GET')
-    },
-    20000
-  )
+    expect(output).toContain('2')
+    expect(output).toContain('/api/hello')
+    expect(output).toContain('GET')
+  }, 20000)
 })

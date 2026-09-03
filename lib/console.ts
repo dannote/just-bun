@@ -2,12 +2,12 @@ import { inspect } from 'node:util'
 import vm from 'node:vm'
 import readline from 'node:readline'
 
-import type { Elysia } from 'elysia'
+import type { AnyElysia } from 'elysia'
 
 import { name } from '../package.json'
 import { db } from './db'
 
-const createContext = (app: Elysia) => {
+const createContext = (app: AnyElysia) => {
   const config = {
     name,
     nodeEnv: process.env.NODE_ENV ?? 'development',
@@ -33,7 +33,7 @@ const createContext = (app: Elysia) => {
   })
 }
 
-export const runConsole = async (app: Elysia) => {
+export const runConsole = async (app: AnyElysia) => {
   if (process.env.ENABLE_CONSOLE !== '1') {
     throw new Error('ENABLE_CONSOLE=1 is required to run the console')
   }
@@ -42,7 +42,7 @@ export const runConsole = async (app: Elysia) => {
   const transpiler = new Bun.Transpiler({
     loader: 'tsx',
     replMode: true
-  } as Bun.TranspilerOptions)
+  })
 
   const rl = readline.createInterface({
     input: process.stdin,
@@ -68,7 +68,7 @@ export const runConsole = async (app: Elysia) => {
           ? (result as { value: unknown }).value
           : result
 
-      if (typeof value !== 'undefined') {
+      if (value !== undefined) {
         console.log(inspect(value, { colors: true, depth: 5 }))
       }
     } catch (error) {

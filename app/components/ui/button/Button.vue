@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { AsTag } from 'reka-ui'
 import type { Component, HTMLAttributes } from 'vue'
-import type { ButtonVariants } from '.'
+import type { ButtonVariants } from './variants'
 
 import { Primitive } from 'reka-ui'
 import { cn } from '~/app/lib/utils'
-import { buttonVariants } from '.'
+import { buttonVariants } from './variants'
 
 type Props = {
   asChild?: boolean

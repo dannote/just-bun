@@ -83,7 +83,7 @@ After installing `just` 1.58 or newer, run `just bun` to fetch Bun if it is not 
 - `just dev` — run the full stack locally.
 - `just build` — [Vite](https://vite.dev) build + [Nitro](https://nitro.unjs.io) output.
 - `just test` — run the test suite; add `--parallel`/`-p` to fan test files out with Bun 1.4.
-- `just format` / `just lint` — run the TypeScript formatters/linters and enforce canonical formatting for every Just module.
+- `just format` / `just lint` — run Oxfmt and type-aware Oxlint, then enforce canonical formatting for every Just module.
 - `just app audit [args]` — check dependencies with `bun audit`.
 - `just app check-dedupe` — fail if Bun can remove duplicate lockfile versions.
 - `just app release` — compile the server to a static Bun binary in `releases/`.

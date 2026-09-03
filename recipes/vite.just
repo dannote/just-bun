@@ -12,7 +12,7 @@ build *args:
 preview *args:
     {{ bun }} run preview {{ args }}
 
-# Format code with Biome
+# Format code with Oxfmt
 format *args:
     {{ bun }} run format {{ args }}
     just _justfile-format
@@ -35,7 +35,7 @@ _justfile-format:
       just --justfile "$file" --fmt
     done < <(find Justfile recipes -type f \( -name 'Justfile' -o -name '*.just' \) | sort)
 
-# Lint code with Biome and oxlint
+# Lint code with Oxlint
 lint *args:
     {{ bun }} run lint {{ args }}
     just _justfile-format-check

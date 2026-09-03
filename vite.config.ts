@@ -24,7 +24,7 @@ export default defineConfig({
       noExternals: true,
       serveStatic: false,
       preset: 'bun',
-      externals: ['bun:sqlite']
+      externals: { external: ['bun:sqlite'] }
     }),
     tailwindcss(),
     vueRouter({ routesFolder: 'app/pages' }),

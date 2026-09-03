@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'bun:test'
-import { spawnSync } from 'node:child_process'
+
+const root = import.meta.dir + '/..'
 
 const runJust = (...args: string[]) =>
-  spawnSync('just', args, {
-    cwd: import.meta.dir + '/..',
+  Bun.spawnSync(['just', ...args], {
+    cwd: root,
     env: { ...process.env, NO_COLOR: '1' },
     stdout: 'pipe',
     stderr: 'pipe'
@@ -16,7 +17,7 @@ describe('Just command interface', () => {
   it('documents the deploy force flag', () => {
     const result = runJust('--usage', 'app', 'deploy')
 
-    expect(result.status).toBe(0)
+    expect(result.exitCode).toBe(0)
     expect(outputOf(result)).toContain('-f, --force')
   })
 
@@ -24,8 +25,8 @@ describe('Just command interface', () => {
     const long = runJust('--dry-run', 'app', 'upload', '--force')
     const short = runJust('--dry-run', 'app', 'upload', '-f')
 
-    expect(long.status).toBe(0)
-    expect(short.status).toBe(0)
+    expect(long.exitCode).toBe(0)
+    expect(short.exitCode).toBe(0)
     expect(outputOf(long)).toContain('force=true')
     expect(outputOf(short)).toContain('force=true')
   })
@@ -33,14 +34,14 @@ describe('Just command interface', () => {
   it('rejects unknown e2e suites before execution', () => {
     const result = runJust('e2e', 'test', 'unknown')
 
-    expect(result.status).not.toBe(0)
+    expect(result.exitCode).not.toBe(0)
     expect(outputOf(result)).toContain('does not match pattern')
   })
 
   it('rejects invalid rollback hashes before execution', () => {
     const result = runJust('app', 'rollback', 'not-a-hash')
 
-    expect(result.status).not.toBe(0)
+    expect(result.exitCode).not.toBe(0)
     expect(outputOf(result)).toContain('does not match pattern')
   })
 
@@ -48,14 +49,14 @@ describe('Just command interface', () => {
     const denied = runJust('--dry-run', 'db', 'reset')
     const accepted = runJust('--dry-run', '--yes', 'db', 'reset')
 
-    expect(denied.status).not.toBe(0)
+    expect(denied.exitCode).not.toBe(0)
     expect(outputOf(denied)).toContain('recipe `reset` was not confirmed')
-    expect(accepted.status).toBe(0)
+    expect(accepted.exitCode).toBe(0)
   })
 
   it('uses DEPLOY_TARGET for accessory repository paths', () => {
-    const result = spawnSync('just', ['--dry-run', 'caddy', 'upload'], {
-      cwd: import.meta.dir + '/..',
+    const result = Bun.spawnSync(['just', '--dry-run', 'caddy', 'upload'], {
+      cwd: root,
       env: {
         ...process.env,
         DEPLOY_TARGET: 'linux-arm64',
@@ -65,7 +66,7 @@ describe('Just command interface', () => {
       stderr: 'pipe'
     })
 
-    expect(result.status).toBe(0)
+    expect(result.exitCode).toBe(0)
     expect(outputOf(result)).toContain('/repo/linux/arm64/caddy.')
   })
 })

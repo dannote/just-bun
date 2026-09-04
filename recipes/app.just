@@ -154,9 +154,9 @@ status: _ssh-open
 logs *args: _ssh-open
     {{ ssh-run }} journalctl -u {{ DEPLOY_PROJECT_NAME }} {{ args }}
 
-# Open the app console (requires ENABLE_CONSOLE=1)
+# Open the app console
 console: _ssh-open
-    {{ ssh-run }} 'cd {{ lib_dir }} && ENABLE_CONSOLE=1 {{ deploy_bin }}/{{ DEPLOY_PROJECT_NAME }} console'
+    {{ ssh-run }} 'cd {{ lib_dir }} && ENABLE_CONSOLE=1 CONSOLE_HISTORY={{ lib_dir }}/.console_history {{ deploy_bin }}/{{ DEPLOY_PROJECT_NAME }} console'
 
 # Full deployment: build, upload, configure, and restart
 [arg('force', long, short='f', value='true', help='Overwrite an existing binary')]

@@ -7,8 +7,8 @@
         "@elysiajs/eden": "^1.4.9",
         "@elysiajs/opentelemetry": "^1.4.9",
         "@iconify/vue": "^5.0.1",
-        "@logtape/logtape": "^2.3.2",
-        "@logtape/syslog": "^2.3.2",
+        "@logtape/logtape": "^2.3.3",
+        "@logtape/syslog": "^2.3.3",
         "@opentelemetry/context-async-hooks": "^2.11.0",
         "@opentelemetry/exporter-trace-otlp-proto": "^0.222.0",
         "@opentelemetry/resources": "^2.11.0",
@@ -93,9 +93,9 @@
 
     "@js-sdsl/ordered-map": ["@js-sdsl/ordered-map@4.4.2", "", {}, "sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw=="],
 
-    "@logtape/logtape": ["@logtape/logtape@2.3.2", "", {}, "sha512-SfxHfSdDlTp6tLpYP5uezNitSCTQUB3FZ1MXDbgDBN9t9kvF+XL0rOGTIa/pJcDMy1o9FELaZ25E/Ypmsf5fNQ=="],
+    "@logtape/logtape": ["@logtape/logtape@2.3.3", "", {}, "sha512-H8AqgCq6M6Wu97FVPyfE5UT4w6H+Wdt9iGzLKPgtJRI/jrG9HbzzNUw9JL1LarkZD8xeKx9FqKfcLaXr0hGJuw=="],
 
-    "@logtape/syslog": ["@logtape/syslog@2.3.2", "", { "peerDependencies": { "@logtape/logtape": "^2.3.2" } }, "sha512-QC7yeeZRqU1J0AzywipSf0wGpyEo0B35kOpopXvzZko8RiPV1BQpJZrokZUQf2HU9DDH0gJ84qpT2+D1iPychw=="],
+    "@logtape/syslog": ["@logtape/syslog@2.3.3", "", { "peerDependencies": { "@logtape/logtape": "^2.3.3" } }, "sha512-US6vxz8yNSrI31AKzPeDRMjyaLIKeWGPFcX3wbI8sqYPB6yxNZUzinc+ubMvU4V1pqONnH2hCFEV45ggjrZEAQ=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
 

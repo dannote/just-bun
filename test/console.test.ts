@@ -7,6 +7,19 @@ const databaseURL = join(import.meta.dir, `${randomUUID()}.db`)
 
 const stripAnsi = (value: string) => Bun.stripANSI(value)
 
+const commands = [
+  'const amount: number = 2',
+  'amount + 3',
+  'await Promise.resolve(9)',
+  'const double = (',
+  'value: number',
+  ') => value * 2',
+  'double(6)',
+  '.routes',
+  '.help',
+  '.exit'
+]
+
 const runConsole = () =>
   new Promise<string>((resolve, reject) => {
     const proc = spawn('bun', ['--bun', 'run', 'server.ts', 'console'], {
@@ -20,7 +33,8 @@ const runConsole = () =>
 
     let output = ''
     let errorOutput = ''
-    let prompted = false
+    let commandIndex = 0
+    let handledPrompts = 0
 
     const onTimeout = setTimeout(() => {
       proc.kill('SIGKILL')
@@ -31,11 +45,10 @@ const runConsole = () =>
       const text = chunk.toString()
       output += text
 
-      if (!prompted && output.includes('just-bun> ')) {
-        prompted = true
-        proc.stdin.write('1 + 1\n')
-        proc.stdin.write('routes\n')
-        proc.stdin.end()
+      const promptCount = output.match(/just-bun> |\| /g)?.length ?? 0
+      while (handledPrompts < promptCount && commandIndex < commands.length) {
+        handledPrompts++
+        proc.stdin.write(`${commands[commandIndex++]}\n`)
       }
     }
 
@@ -56,11 +69,15 @@ const runConsole = () =>
   })
 
 describe('app console', () => {
-  it('evaluates input and prints routes', async () => {
+  it('supports TypeScript, persistent scope, await, routes, and help', async () => {
     const output = await runConsole()
 
-    expect(output).toContain('2')
+    expect(output).toContain('5')
+    expect(output).toContain('9')
+    expect(output).toContain('12')
     expect(output).toContain('/api/hello')
     expect(output).toContain('GET')
+    expect(output).toContain('.routes')
+    expect(output).toContain('.exit')
   }, 20000)
 })

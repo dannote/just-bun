@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Upgraded to Vite 8 with Rolldown, enabled browser-console forwarding during development, and removed the obsolete OpenTelemetry machine-ID transform
 - Replaced Biome with Oxfmt and upgraded the Oxlint TypeScript linting stack
 - Upgraded compatible Elysia, Vue, Tailwind, ArkType, Reka UI, and build-tool dependencies
 - Added a configurable Vector file-log sink to prevent recursive journald output in e2e tests

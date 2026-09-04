@@ -22,7 +22,7 @@
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/sdk-trace-base": "2.2.0",
     "@opentelemetry/semantic-conventions": "1.38.0",
-    "@unhead/vue": "^2.1.17",
+    "@unhead/vue": "^3.4.0",
     "arktype": "^2.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Upgraded to Vue Router 5's built-in file-based routing and removed `unplugin-vue-router`
 - Upgraded Unhead to v3 and enabled development-time head validation
 - Upgraded to Vite 8 with Rolldown, enabled browser-console forwarding during development, and removed the obsolete OpenTelemetry machine-ID transform
 - Replaced Biome with Oxfmt and upgraded the Oxlint TypeScript linting stack

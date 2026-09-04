@@ -6,8 +6,8 @@ import { nitro } from 'nitro/vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import autoImport from 'unplugin-auto-import/vite'
-import vueRouter from 'unplugin-vue-router/vite'
-import { VueRouterAutoImports } from 'unplugin-vue-router'
+import vueRouter from 'vue-router/vite'
+import { VueRouterAutoImports } from 'vue-router/unplugin'
 
 export default defineConfig({
   server: {
@@ -27,7 +27,7 @@ export default defineConfig({
       externals: { external: ['bun:sqlite'] }
     }),
     tailwindcss(),
-    vueRouter({ routesFolder: 'app/pages' }),
+    vueRouter({ routesFolder: 'app/pages', dts: 'route-map.d.ts' }),
     autoImport({ imports: ['vue', VueRouterAutoImports] }),
     vue()
   ]

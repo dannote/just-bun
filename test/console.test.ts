@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'bun:test'
 import { spawn } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
+import { join } from 'node:path'
+
+const databaseURL = join(import.meta.dir, `${randomUUID()}.db`)
 
 const stripAnsi = (value: string) => Bun.stripANSI(value)
 
@@ -9,7 +13,8 @@ const runConsole = () =>
       env: {
         ...process.env,
         ENABLE_CONSOLE: '1',
-        NODE_ENV: 'test'
+        NODE_ENV: 'test',
+        DATABASE_URL: databaseURL
       }
     })
 

@@ -10,9 +10,8 @@
       "@vue/compiler-sfc",
       "@unhead/vue",
       "vue-router",
-      "unplugin-vue-router/client",
       "vite/client"
     ]
   },
-  "include": ["**/*.ts", "**/*.vue", "auto-imports.d.ts", "typed-router.d.ts"]
+  "include": ["**/*.ts", "**/*.vue", "auto-imports.d.ts", "route-map.d.ts"]
 }

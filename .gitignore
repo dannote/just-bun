@@ -17,7 +17,7 @@ node_modules
 /repo
 
 /auto-imports.d.ts
-/typed-router.d.ts
+/route-map.d.ts
 
 /configs/generated/*
 !configs/generated/.keep

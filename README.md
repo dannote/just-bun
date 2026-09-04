@@ -86,13 +86,13 @@ After installing `just` 1.58 or newer, run `just bun` to fetch Bun if it is not 
 - `just format` / `just lint` — run Oxfmt and type-aware Oxlint, then enforce canonical formatting for every Just module.
 - `just app audit [args]` — check dependencies with `bun audit`.
 - `just app check-dedupe` — fail if Bun can remove duplicate lockfile versions.
-- `just app release` — compile the server to a static Bun binary in `releases/`.
+- `just app release [target]` — compile the server to `repo/local/`, or to `repo/<os>/<arch>/` when a target such as `linux-arm64` is supplied.
 - `just ssh` — open an interactive shell on the deploy target.
 - `just repo collect|status|verify` — manage the local binary repository. See [The repository](#the-repository).
 - `just app start|stop|restart|status` — manage the app service.
 - `just app enable|disable` — enable or disable the app service without removing files.
 - `just app logs <journalctl args>` — stream service logs like `just app logs -f`.
-- `just app console` — open an SSH-only TypeScript console with history, completion, and the app environment.
+- `just app console` — open an SSH-only TypeScript console. It exposes `app`, `db`, `env`, `config`, and `routes`; supports completion, multiline input and top-level `await`; and stores history in the app's state directory. Run `.routes` to inspect the registered method/path pairs.
 - `just app version` — show currently deployed version hash.
 - `just app versions` — list all available versions on server.
 - `just app rollback [hash]` — rollback to previous version or a specific hash.
@@ -172,9 +172,10 @@ deploy-and-manage flow as the app: rsync a pinned binary, render configs from
 `configs/`, and let systemd supervise it. They are intentionally optional, so
 you can turn them on only when you need them. Caddy fronts the app with TLS and
 static assets, Vector ships journald logs to S3, Litestream replicates SQLite
-databases to S3, and Forgejo adds a self-hosted Git forge. Each one can be
-deployed and managed independently via `just caddy`, `just litestream`,
-`just vector`, or `just forgejo`.
+databases to S3, Forgejo adds a self-hosted Git forge, Gatus monitors service
+health, `mc` manages S3-compatible storage, and Typst compiles documents. Each
+one can be deployed and managed independently through its corresponding
+`just <accessory>` module.
 
 - `just caddy deploy|start|stop|restart|status` — manage the Caddy reverse proxy.
 - `just forgejo deploy|start|stop|restart|status` — manage the Forgejo Git forge.
@@ -185,6 +186,9 @@ deployed and managed independently via `just caddy`, `just litestream`,
 - `just litestream snapshots [db]` — list snapshots (defaults to current app's DB).
 - `just litestream databases` — show which databases are being replicated.
 - `just vector deploy|start|stop|restart|status` — manage the Vector log aggregator.
+- `just gatus build|deploy|start|stop|restart|status` — build and manage Gatus health monitoring.
+- `just mc deploy|require` — install or verify the MinIO client on the server.
+- `just typst deploy|require` — install or verify the Typst document compiler.
 
 ## The repository
 
@@ -198,7 +202,24 @@ just repo status         # see what's in your local repo
 just repo verify         # re-verify checksums
 ```
 
-Each binary is version-pinned and checksum-verified against upstream signatures. Default versions live in `recipes/versions.just` so repository collection and accessory deployment cannot drift apart; environment variables such as `CADDY_VERSION` still override them. The repo structure mirrors target platforms, so you can cross-deploy from any development machine:
+Downloaded binaries are pinned and checked against upstream checksums when the vendor publishes them. Typst and Vector do not currently provide checksum files through these download flows, so their collectors record a local SHA-256 digest for subsequent integrity checks instead. Default versions live in `recipes/versions.just`, keeping repository collection and accessory deployment in sync while still allowing environment overrides such as `CADDY_VERSION`.
+
+To bump a binary, change its default once in `recipes/versions.just`, then collect and verify it for the deployment target before running the relevant e2e suite:
+
+```bash
+REPO_OS=linux REPO_ARCH=arm64 just repo collect vector
+REPO_OS=linux REPO_ARCH=arm64 just repo verify vector
+just e2e test
+```
+
+You can test a candidate without editing the pin by setting its version variable for both commands:
+
+```bash
+VECTOR_VERSION=0.59.0 just repo collect vector
+VECTOR_VERSION=0.59.0 just repo verify vector
+```
+
+The repo structure mirrors target platforms, so you can cross-deploy from any development machine. An abbreviated repository looks like this:
 
 ```
 repo/

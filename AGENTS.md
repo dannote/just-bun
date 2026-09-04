@@ -49,7 +49,7 @@ We prioritize speed and simplicity. Key points:
 
 - **Config templates** live in `configs/` (`.caddy`, `.service`, `.yaml`). They use `${VAR}` syntax and are processed via `_generate-config`.
 - **Delta transfers**: rsync uploads to a stable path in `/var/cache/` so only changed bytes transfer.
-- **Accessories**: Caddy and Vector are managed via `recipes/accessories/`. They have their own `deploy`, `restart`, `status` recipes.
+- **Accessories**: Caddy, Forgejo, Gatus, Litestream, `mc`, Typst, and Vector are managed via `recipes/accessories/`. Shared version defaults live in `recipes/versions.just`, repository download behavior in `recipes/repo/common.just`, and deployment-target paths in `recipes/accessory.just`.
 - **Observability**: Vector collects logs from journald and exports to S3. Traces go to the OTLP endpoint configured in `.env`.
 
 For the full deployment flow, read the "Deployment" section in `README.md`.

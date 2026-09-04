@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Upgraded LogTape and its syslog sink to v2, and reduced internal diagnostics to warnings
 - Upgraded to Vue Router 5's built-in file-based routing and removed `unplugin-vue-router`
 - Upgraded Unhead to v3 and enabled development-time head validation
 - Upgraded to Vite 8 with Rolldown, enabled browser-console forwarding during development, and removed the obsolete OpenTelemetry machine-ID transform

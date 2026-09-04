@@ -16,7 +16,7 @@ export async function setupLogs() {
         ...(isDev ? {} : { syslog: getSyslogSink() })
       },
       loggers: [
-        { category: ['logtape', 'meta'], sinks },
+        { category: ['logtape', 'meta'], lowestLevel: 'warning', sinks },
         { category: name, lowestLevel: isDev ? 'debug' : 'info', sinks }
       ],
       reset: !!import.meta.hot

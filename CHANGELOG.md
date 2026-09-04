@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Removed the unused Tailwind ESLint plugin and aligned the OpenTelemetry SDK/exporter packages on their current release line
 - Upgraded Nitro to the current v3 beta and adopted its typed `noExternals` configuration
 - Upgraded Kysely to 0.29, replaced the stale Bun SQLite dialect dependency with Kysely's built-in SQLite driver adapter, and propagate request cancellation to database queries
 - Upgraded LogTape and its syslog sink to v2, and reduced internal diagnostics to warnings

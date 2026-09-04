@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Made every e2e suite prepare its required release and verified binary dependencies from a clean checkout, with retry-safe downloads
+- Updated Bun's TypeScript definitions to 1.4.1
 - Upgraded the server console to Bun's Node-compatible REPL with TypeScript evaluation, multiline input, completion, persistent history, and built-in commands
 - Updated LogTape and its syslog sink to 2.3.3
 - Removed the unused Tailwind ESLint plugin and aligned the OpenTelemetry SDK/exporter packages on their current release line

@@ -51,8 +51,8 @@ _download:
     echo '{{ ACCENT }}Downloading mc {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl -fsSL {{ binary_url }} -o {{ staging_path }}/mc
-    curl -fsSL {{ checksum_url }} -o {{ staging_path }}/mc.sha256sum
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ binary_url }} -o {{ staging_path }}/mc
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksum_url }} -o {{ staging_path }}/mc.sha256sum
 
 _verify-vendor:
     #!/usr/bin/env bash

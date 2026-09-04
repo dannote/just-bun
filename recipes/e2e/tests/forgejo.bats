@@ -12,15 +12,6 @@ load helpers
 @test "forgejo: binary exists in repo" {
   target_path=${DEPLOY_TARGET/-//}
 
-  # Check if binary exists
-  run ls repo/$target_path/forgejo.*
-  if [ "$status" -ne 0 ]; then
-    # Try to collect it
-    run just repo forgejo collect
-    [ "$status" -eq 0 ]
-  fi
-
-  # Verify binary exists
   run ls repo/$target_path/forgejo.*
   [ "$status" -eq 0 ]
 }

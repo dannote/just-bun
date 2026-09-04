@@ -110,7 +110,7 @@ The deployment workflow has a lot of moving parts: building binaries, uploading 
 
 The tests spin up a Fedora container with systemd using Docker that mimics a real production server. They then run through the entire deployment lifecycle—build, release, upload, service setup, start/stop, rollback, and cleanup—verifying each step works correctly. This catches integration issues that unit tests miss, like permission problems, missing dependencies, or broken systemd configurations.
 
-Tests are written in [Bats](https://github.com/bats-core/bats-core), the Bash Automated Testing System, which keeps them readable and close to the actual shell commands you'd run manually. Run `just e2e test` to execute the full suite, or use `just e2e ssh` to drop into the test container for debugging.
+Tests are written in [Bats](https://github.com/bats-core/bats-core), the Bash Automated Testing System, which keeps them readable and close to the actual shell commands you'd run manually. Run `just e2e test` to execute the full suite, or use `just e2e ssh` to drop into the test container for debugging. Each test command collects and verifies the binaries its selected suite needs, so it also works from a clean checkout; downloads are cached under the ignored `repo/` directory.
 
 - `just e2e test` — run all e2e tests against a local container.
 - `just e2e test deploy` — run only deployment tests.

@@ -54,7 +54,7 @@ _download:
     echo '{{ ACCENT }}Downloading vector {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
     tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _compute-checksum:

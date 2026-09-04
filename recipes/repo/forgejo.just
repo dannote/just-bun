@@ -57,8 +57,8 @@ _download:
     echo '{{ ACCENT }}Downloading forgejo {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl -fsSL {{ binary_url }} -o {{ staging_path }}/forgejo
-    curl -fsSL {{ checksum_url }} -o {{ staging_path }}/forgejo.sha256
+    curl --http1.1 --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ binary_url }} -o {{ staging_path }}/forgejo
+    curl --http1.1 --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksum_url }} -o {{ staging_path }}/forgejo.sha256
 
 _verify-vendor:
     #!/usr/bin/env bash

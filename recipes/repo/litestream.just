@@ -54,8 +54,8 @@ _download:
     echo '{{ ACCENT }}Downloading litestream {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
-    curl -fsSL {{ checksums_url }} -o {{ staging_path }}/checksums.txt
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksums_url }} -o {{ staging_path }}/checksums.txt
     tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _verify-vendor:

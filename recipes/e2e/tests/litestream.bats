@@ -42,15 +42,6 @@ teardown_file() {
 @test "litestream: binary exists in repo" {
   target_path=${DEPLOY_TARGET/-//}
 
-  # Check if binary exists
-  run ls repo/$target_path/litestream.*
-  if [ "$status" -ne 0 ]; then
-    # Try to collect it
-    run just repo litestream collect
-    [ "$status" -eq 0 ]
-  fi
-
-  # Verify binary exists
   run ls repo/$target_path/litestream.*
   [ "$status" -eq 0 ]
 }

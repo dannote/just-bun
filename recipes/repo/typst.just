@@ -52,7 +52,7 @@ _download:
     echo '{{ ACCENT }}Downloading typst {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.xz
+    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.xz
     tar -xJf {{ staging_path }}/archive.tar.xz -C {{ staging_path }}
 
 _compute-checksum:

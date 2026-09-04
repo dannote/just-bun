@@ -67,6 +67,28 @@ describe('Just command interface', () => {
     })
 
     expect(result.exitCode).toBe(0)
-    expect(outputOf(result)).toContain('/repo/linux/arm64/caddy.')
+    expect(outputOf(result)).toContain('/repo/linux/arm64/caddy.2.11.4')
+  })
+
+  it('shares binary versions between repository and accessory recipes', () => {
+    const info = runJust('repo', 'info')
+    const upload = runJust('--dry-run', 'forgejo', 'upload')
+
+    expect(info.exitCode).toBe(0)
+    expect(outputOf(info)).toContain('forgejo 16.0.3')
+    expect(upload.exitCode).toBe(0)
+    expect(outputOf(upload)).toContain('/forgejo.16.0.3')
+  })
+
+  it('allows binary version overrides', () => {
+    const result = Bun.spawnSync(['just', 'repo', 'caddy', 'info'], {
+      cwd: root,
+      env: { ...process.env, CADDY_VERSION: '9.9.9', NO_COLOR: '1' },
+      stdout: 'pipe',
+      stderr: 'pipe'
+    })
+
+    expect(result.exitCode).toBe(0)
+    expect(outputOf(result)).toContain('caddy 9.9.9')
   })
 })

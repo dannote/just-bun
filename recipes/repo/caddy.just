@@ -1,18 +1,14 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "Fast, multi-platform web server"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('CADDY_VERSION', '2.10.2')
+version := caddy_version
 
 # Caddy uses 'mac' not 'darwin'
 caddy_os := if os == "darwin" { "mac" } else { os }
 platform := caddy_os + "_" + arch
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/caddy"
-binary_path := repo_path + "/caddy." + version
+staging_path := repo_staging_path('caddy')
+binary_path := repo_binary_path('caddy', version)
 
 base_url := "https://github.com/caddyserver/caddy/releases/download/v" + version
 archive_name := "caddy_" + version + "_" + platform + ".tar.gz"
@@ -54,8 +50,8 @@ _download:
     echo '{{ ACCENT }}Downloading caddy {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksums_url }} -o {{ staging_path }}/checksums.txt
+    {{ curl }} {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    {{ curl }} {{ checksums_url }} -o {{ staging_path }}/checksums.txt
     tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _verify-vendor:

@@ -1,18 +1,14 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "Streaming SQLite replication to S3"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('LITESTREAM_VERSION', '0.5.5')
+version := litestream_version
 
 # Litestream uses x86_64 not amd64
 litestream_arch := if arch == "amd64" { "x86_64" } else { arch }
 platform := os + "-" + litestream_arch
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/litestream"
-binary_path := repo_path + "/litestream." + version
+staging_path := repo_staging_path('litestream')
+binary_path := repo_binary_path('litestream', version)
 
 base_url := "https://github.com/benbjohnson/litestream/releases/download/v" + version
 archive_name := "litestream-" + version + "-" + platform + ".tar.gz"
@@ -54,8 +50,8 @@ _download:
     echo '{{ ACCENT }}Downloading litestream {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksums_url }} -o {{ staging_path }}/checksums.txt
+    {{ curl }} {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    {{ curl }} {{ checksums_url }} -o {{ staging_path }}/checksums.txt
     tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _verify-vendor:

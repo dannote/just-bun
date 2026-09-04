@@ -1,9 +1,9 @@
-import "../ssh.just"
 import "../colors.just"
+import "../accessory.just"
+import "../versions.just"
 
-root := justfile_directory()
-version := env('TYPST_VERSION', '0.14.2')
-repo_path := root + "/repo/" + replace(env("DEPLOY_TARGET", "linux-amd64"), "-", "/")
+version := typst_version
+repo_path := accessory_repo_path
 
 # Ensure Typst is installed
 require: _ssh-open

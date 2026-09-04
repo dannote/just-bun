@@ -2,9 +2,11 @@ service_name := "forgejo"
 
 import "./service.just"
 import "../config.just"
+import "../accessory.just"
+import "../versions.just"
 
-version := env('FORGEJO_VERSION', '13.0.3')
-repo_path := root + "/repo/" + replace(DEPLOY_TARGET, "-", "/")
+version := forgejo_version
+repo_path := accessory_repo_path
 
 etc_dir := deploy_etc + "/forgejo"
 lib_dir := deploy_lib + "/forgejo"

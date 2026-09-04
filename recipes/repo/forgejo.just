@@ -1,16 +1,12 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "Self-hosted Git forge"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('FORGEJO_VERSION', '13.0.3')
+version := forgejo_version
 
 platform := os + "-" + arch
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/forgejo"
-binary_path := repo_path + "/forgejo." + version
+staging_path := repo_staging_path('forgejo')
+binary_path := repo_binary_path('forgejo', version)
 
 base_url := "https://codeberg.org/forgejo/forgejo/releases/download/v" + version
 binary_name := "forgejo-" + version + "-" + platform
@@ -57,8 +53,8 @@ _download:
     echo '{{ ACCENT }}Downloading forgejo {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --http1.1 --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ binary_url }} -o {{ staging_path }}/forgejo
-    curl --http1.1 --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksum_url }} -o {{ staging_path }}/forgejo.sha256
+    {{ curl_http1 }} {{ binary_url }} -o {{ staging_path }}/forgejo
+    {{ curl_http1 }} {{ checksum_url }} -o {{ staging_path }}/forgejo.sha256
 
 _verify-vendor:
     #!/usr/bin/env bash

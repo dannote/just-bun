@@ -198,20 +198,20 @@ just repo status         # see what's in your local repo
 just repo verify         # re-verify checksums
 ```
 
-Each binary is version-pinned and checksum-verified against upstream signatures. The repo structure mirrors target platforms, so you can cross-deploy from any development machine:
+Each binary is version-pinned and checksum-verified against upstream signatures. Default versions live in `recipes/versions.just` so repository collection and accessory deployment cannot drift apart; environment variables such as `CADDY_VERSION` still override them. The repo structure mirrors target platforms, so you can cross-deploy from any development machine:
 
 ```
 repo/
 ├── linux/
 │   └── amd64/
-│       ├── caddy.2.10.2
-│       ├── caddy.2.10.2.sig
-│       ├── forgejo.13.0.3
-│       ├── forgejo.13.0.3.sig
-│       ├── litestream.0.5.5
-│       ├── litestream.0.5.5.sig
-│       ├── vector.0.52.0
-│       ├── vector.0.52.0.sig
+│       ├── caddy.2.11.4
+│       ├── caddy.2.11.4.sig
+│       ├── forgejo.16.0.3
+│       ├── forgejo.16.0.3.sig
+│       ├── litestream.0.5.17
+│       ├── litestream.0.5.17.sig
+│       ├── vector.0.58.0
+│       ├── vector.0.58.0.sig
 │       └── just-bun.a1b2c3d
 └── darwin/
     └── arm64/

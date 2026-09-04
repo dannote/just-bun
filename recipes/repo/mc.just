@@ -1,16 +1,12 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "MinIO client for S3-compatible storage"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('MC_VERSION', '2025-08-13T08-35-41Z')
+version := mc_version
 
 platform := os + "-" + arch
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/mc"
-binary_path := repo_path + "/mc." + version
+staging_path := repo_staging_path('mc')
+binary_path := repo_binary_path('mc', version)
 
 base_url := "https://dl.min.io/client/mc/release/" + platform + "/archive"
 binary_url := base_url + "/mc.RELEASE." + version
@@ -51,8 +47,8 @@ _download:
     echo '{{ ACCENT }}Downloading mc {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ binary_url }} -o {{ staging_path }}/mc
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ checksum_url }} -o {{ staging_path }}/mc.sha256sum
+    {{ curl }} {{ binary_url }} -o {{ staging_path }}/mc
+    {{ curl }} {{ checksum_url }} -o {{ staging_path }}/mc.sha256sum
 
 _verify-vendor:
     #!/usr/bin/env bash

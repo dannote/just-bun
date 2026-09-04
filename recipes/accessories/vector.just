@@ -2,9 +2,11 @@ service_name := "vector"
 
 import "./service.just"
 import "../config.just"
+import "../accessory.just"
+import "../versions.just"
 
-version := env('VECTOR_VERSION', '0.52.0')
-repo_path := root + "/repo/" + replace(DEPLOY_TARGET, "-", "/")
+version := vector_version
+repo_path := accessory_repo_path
 
 etc_dir := deploy_etc + "/vector"
 lib_dir := deploy_lib + "/vector"

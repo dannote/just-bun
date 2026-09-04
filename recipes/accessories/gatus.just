@@ -4,9 +4,11 @@ set unstable
 
 import "./service.just"
 import "../config.just"
+import "../accessory.just"
+import "../versions.just"
 
-version := env('GATUS_VERSION', '5.34.0')
-repo_path := root + "/repo/" + replace(DEPLOY_TARGET, "-", "/")
+version := gatus_version
+repo_path := accessory_repo_path
 
 etc_dir := deploy_etc + "/gatus"
 lib_dir := deploy_lib + "/gatus"

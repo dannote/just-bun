@@ -1,19 +1,15 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "Markup-based typesetting system"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('TYPST_VERSION', '0.14.2')
+version := typst_version
 
 musl_arch := if arch == "amd64" { "x86_64" } else { "aarch64" }
 darwin_arch := if arch == "amd64" { "x86_64" } else { "aarch64" }
 platform := if os == "darwin" { darwin_arch + "-apple-darwin" } else { musl_arch + "-unknown-linux-musl" }
 
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/typst"
-binary_path := repo_path + "/typst." + version
+staging_path := repo_staging_path('typst')
+binary_path := repo_binary_path('typst', version)
 
 base_url := "https://github.com/typst/typst/releases/download/v" + version
 archive_url := base_url + "/typst-" + platform + ".tar.xz"
@@ -52,7 +48,7 @@ _download:
     echo '{{ ACCENT }}Downloading typst {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.xz
+    {{ curl }} {{ archive_url }} -o {{ staging_path }}/archive.tar.xz
     tar -xJf {{ staging_path }}/archive.tar.xz -C {{ staging_path }}
 
 _compute-checksum:

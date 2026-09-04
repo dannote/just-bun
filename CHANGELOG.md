@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Delta transfers via rsync with stable cache paths
 
 ### Changed
+- Centralized binary versions and repository download settings, removing duplicated version pins, paths, and curl retry flags across Just recipes
+- Updated Caddy to 2.11.4, Forgejo to 16.0.3, Gatus to 5.36.0, Litestream to 0.5.17, Typst to 0.15.1, and Vector to 0.58.0
 - Made every e2e suite prepare its required release and verified binary dependencies from a clean checkout, with retry-safe downloads
 - Updated Bun's TypeScript definitions to 1.4.1
 - Upgraded the server console to Bun's Node-compatible REPL with TypeScript evaluation, multiline input, completion, persistent history, and built-in commands

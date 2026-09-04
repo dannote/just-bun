@@ -1,9 +1,9 @@
-import "../ssh.just"
 import "../colors.just"
+import "../accessory.just"
+import "../versions.just"
 
-root := justfile_directory()
-version := env('MC_VERSION', '2025-08-13T08-35-41Z')
-repo_path := root + "/repo/" + replace(env("DEPLOY_TARGET", "linux-amd64"), "-", "/")
+version := mc_version
+repo_path := accessory_repo_path
 
 export DEPLOY_BIN := deploy_bin
 

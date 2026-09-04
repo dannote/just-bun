@@ -2,9 +2,11 @@ service_name := "caddy"
 
 import "./service.just"
 import "../config.just"
+import "../accessory.just"
+import "../versions.just"
 
-version := env('CADDY_VERSION', '2.10.2')
-repo_path := root + "/repo/" + replace(DEPLOY_TARGET, "-", "/")
+version := caddy_version
+repo_path := accessory_repo_path
 
 etc_dir := deploy_etc + "/caddy"
 lib_dir := deploy_lib + "/caddy"

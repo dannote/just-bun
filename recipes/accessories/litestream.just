@@ -5,10 +5,11 @@ service_name := "litestream"
 
 import "./service.just"
 import "../config.just"
+import "../accessory.just"
+import "../versions.just"
 
-version := env('LITESTREAM_VERSION', '0.5.5')
-deploy_target := env('DEPLOY_TARGET', 'linux-amd64')
-repo_path := root + "/repo/" + replace(deploy_target, "-", "/")
+version := litestream_version
+repo_path := accessory_repo_path
 
 etc_dir := deploy_etc + "/litestream"
 app_db := deploy_lib + "/" + DEPLOY_PROJECT_NAME + "/app.db"

@@ -1,19 +1,15 @@
 import "../colors.just"
+import "./common.just"
 
 desc := "Observability data pipeline"
-root := justfile_directory()
-
-os := env('REPO_OS', 'linux')
-arch := env('REPO_ARCH', 'amd64')
-version := env('VECTOR_VERSION', '0.52.0')
+version := vector_version
 
 # Vector platform: x86_64-unknown-linux-gnu or arm64-apple-darwin
 gnu_arch := if arch == "amd64" { "x86_64" } else if os == "darwin" { "arm64" } else { "aarch64" }
 platform := if os == "darwin" { gnu_arch + "-apple-darwin" } else { gnu_arch + "-unknown-linux-gnu" }
 
-repo_path := root + "/repo/" + os + "/" + arch
-staging_path := repo_path + "/.staging/vector"
-binary_path := repo_path + "/vector." + version
+staging_path := repo_staging_path('vector')
+binary_path := repo_binary_path('vector', version)
 
 base_url := "https://github.com/vectordotdev/vector/releases/download/v" + version
 archive_url := base_url + "/vector-" + version + "-" + platform + ".tar.gz"
@@ -54,7 +50,7 @@ _download:
     echo '{{ ACCENT }}Downloading vector {{ version }} ({{ platform }})...{{ RESET }}'
 
     mkdir -p {{ staging_path }}
-    curl --retry 5 --retry-all-errors --retry-delay 2 -fsSL {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
+    {{ curl }} {{ archive_url }} -o {{ staging_path }}/archive.tar.gz
     tar -xzf {{ staging_path }}/archive.tar.gz -C {{ staging_path }}
 
 _compute-checksum:

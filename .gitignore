@@ -2,8 +2,9 @@ node_modules
 
 .data
 .nitro
-.cache
 .output
+.cache
+.justcache/
 
 /data
 

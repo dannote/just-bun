@@ -200,9 +200,12 @@ The `repo/` directory is a local binary repository organized by platform. Instea
 just repo collect        # download and verify all binaries
 just repo status         # see what's in your local repo
 just repo verify         # re-verify checksums
+just repo outdated       # compare pins with upstream stable releases
 ```
 
 Downloaded binaries are pinned and checked against upstream checksums when the vendor publishes them. Typst and Vector do not currently provide checksum files through these download flows, so their collectors record a local SHA-256 digest for subsequent integrity checks instead. Default versions live in `recipes/versions.just`, keeping repository collection and accessory deployment in sync while still allowing environment overrides such as `CADDY_VERSION`.
+
+The read-only `just repo outdated` command checks all pins concurrently and labels available changes as patch, minor, or major without editing files. It ignores GitHub prereleases and development tags. Use `just repo outdated --fail` when a non-zero exit code is useful in scheduled CI; updates still require review because major releases and configuration changes are never applied automatically.
 
 To bump a binary, change its default once in `recipes/versions.just`, then collect and verify it for the deployment target before running the relevant e2e suite:
 

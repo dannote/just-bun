@@ -3,6 +3,7 @@ set lists
 set script-interpreter := ['bun', '--bun', 'run']
 
 import "./colors.just"
+import "./versions.just"
 
 root := justfile_directory()
 repo_dir := root + "/repo"
@@ -75,6 +76,14 @@ verify-one app:
 # Collect and verify all binaries
 build: collect-all verify-all
     @echo '{{ SUCCESS }}Repo build complete{{ RESET }}'
+
+# Report newer stable binary releases without changing pins
+[arg('fail', long, value='1', help='Exit non-zero when updates are available')]
+outdated fail='0':
+    CHECK_BINARY_VERSIONS={{ fail }} bun --bun run {{ root }}/lib/repo/outdated.ts \
+      caddy={{ caddy_version }} forgejo={{ forgejo_version }} \
+      gatus={{ gatus_version }} litestream={{ litestream_version }} \
+      mc={{ mc_version }} typst={{ typst_version }} vector={{ vector_version }}
 
 # Show repository contents
 status:

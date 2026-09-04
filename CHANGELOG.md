@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Read-only `just repo outdated` reporting for stable upstream binary releases, with an optional CI failure mode
 - Type-aware Oxlint policy checks and Oxfmt formatting configured for concise, actionable agent feedback
 - Bun 1.4-powered parallel test mode, dependency audit, and lockfile deduplication checks
 - Regression tests for Just flags, argument validation, confirmations, and deployment-target paths

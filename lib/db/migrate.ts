@@ -2,7 +2,8 @@ import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { Migrator, type Migration } from 'kysely'
+import type { Migration } from 'kysely/migration'
+import { Migrator } from 'kysely/migration'
 import { getLogger } from '@logtape/logtape'
 
 import { db } from './client'

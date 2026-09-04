@@ -1,22 +1,24 @@
+import type { AbortableQueryOptions } from 'kysely'
+
 import { db } from '../client'
 import type { Person } from '../schema'
 
-export function findAllPeople() {
-  return db.selectFrom('person').selectAll().execute()
+export function findAllPeople(options?: AbortableQueryOptions) {
+  return db.selectFrom('person').selectAll().execute(options)
 }
 
-export function findPerson(id: string) {
+export function findPerson(id: string, options?: AbortableQueryOptions) {
   return db
     .selectFrom('person')
     .selectAll()
     .where('id', '=', id)
-    .executeTakeFirst()
+    .executeTakeFirst(options)
 }
 
-export function createPerson(person: Person) {
+export function createPerson(person: Person, options?: AbortableQueryOptions) {
   return db
     .insertInto('person')
     .values(person)
     .returningAll()
-    .executeTakeFirst()
+    .executeTakeFirst(options)
 }

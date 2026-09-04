@@ -28,19 +28,28 @@ const app = new Elysia()
       query: type({ id: 'string.numeric.parse' })
     }
   )
-  .get('/api/people', () => findAllPeople())
+  .get('/api/people', ({ request }) =>
+    findAllPeople({ signal: request.signal })
+  )
   .get(
     '/api/people/:id',
-    async ({ params: { id } }) => {
-      const person = await findPerson(id)
+    async ({ params: { id }, request }) => {
+      const person = await findPerson(id, { signal: request.signal })
       if (!person) throw new Error('Person not found')
       return person
     },
     { params: type({ id: 'string' }) }
   )
-  .post('/api/people', ({ body }) => createPerson(body), {
-    body: type({ name: 'string', age: 'number' })
-  })
+  .post(
+    '/api/people',
+    ({ body, request }) =>
+      createPerson(body, {
+        signal: request.signal
+      }),
+    {
+      body: type({ name: 'string', age: 'number' })
+    }
+  )
   .onRequest((ctx) => logger.info`${ctx.request.method} ${ctx.request.url}`)
 
 if (process.argv[2] === 'console') {

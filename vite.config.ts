@@ -21,10 +21,9 @@ export default defineConfig({
   plugins: [
     // Nitro is just the bundling shell; Elysia still serves the HTTP requests.
     nitro({
-      noExternals: true,
+      noExternals: ['bun:sqlite'],
       serveStatic: false,
-      preset: 'bun',
-      externals: { external: ['bun:sqlite'] }
+      preset: 'bun'
     }),
     tailwindcss(),
     vueRouter({ routesFolder: 'app/pages', dts: 'route-map.d.ts' }),
